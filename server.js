@@ -20,6 +20,7 @@ const db = new sqlite3.Database('./database.db', (err) => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT,
             type TEXT,
+            workout_category TEXT,
             duration INTEGER,
             calories INTEGER,
             notes TEXT
@@ -27,8 +28,9 @@ const db = new sqlite3.Database('./database.db', (err) => {
         db.run(`CREATE TABLE IF NOT EXISTS measurements (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT,
-            chest REAL,
-            waist REAL
+            weight REAL,
+            calories_target INTEGER,
+            calories_consumed INTEGER
         )`);
     }
 });
@@ -43,6 +45,24 @@ if (apiKey) {
 } else {
     console.warn("ATTENZIONE: GEMINI_API_KEY non trovata.");
 }
+
+// API: Ottieni allenamenti
+app.get('/api/workouts', (req, res) => {
+    db.all("SELECT * FROM workouts ORDER BY id DESC", [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+// API: Salva allenamento
+app.post('/api/workouts', (req, res) => {
+    const { date, type, workout_category, duration, calories, notes } = req.body;
+    const query = `INSERT INTO workouts (date, type, workout_category, duration, calories, notes) VALUES (?, ?, ?, ?, ?, ?)`;
+    db.run(query, [date, type, workout_category, duration, calories, notes], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ id: this.lastID, success: true });
+    });
+});
 
 // Endpoint AI
 app.post('/api/ask-ai', async (req, res) => {
