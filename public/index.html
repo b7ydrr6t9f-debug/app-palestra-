@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LiberoFlow - Habit Tracker</title>
-    <!-- Tailwind CSS CDN per un design moderno e pulito -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -68,11 +68,9 @@
 
     <!-- Script di gestione -->
     <script>
-        // Gestione data odierna
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('it-IT', options);
 
-        // Caricamento dati da localStorage
         let habits = JSON.parse(localStorage.getItem('liberoflow_habits')) || [
             { id: 1, name: 'Studio Semestre Filtro (Biologia/Chimica)', completed: false },
             { id: 2, name: 'Sessione di programmazione', completed: false }
@@ -140,7 +138,6 @@
             saveData();
         });
 
-        // Primo rendering
         renderHabits();
     </script>
 </body>
