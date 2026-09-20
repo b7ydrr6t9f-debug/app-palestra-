@@ -2,7 +2,7 @@
   "name": "liberoflow",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
+    "start": "node server.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
