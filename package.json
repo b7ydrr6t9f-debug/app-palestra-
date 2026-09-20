@@ -1,14 +1,23 @@
 {
-  "name": "app-palestra",
+  "name": "liberoflow",
   "version": "1.0.0",
-  "description": "App Palestra Fitness Tracker",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.21.0",
-    "express": "^4.18.2",
-    "sqlite3": "^5.1.7"
-  }
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "expo": "~51.0.0",
+    "expo-status-bar": "~1.12.1",
+    "react": "18.2.0",
+    "react-native": "0.74.1",
+    "react-native-safe-area-context": "4.10.5",
+    "react-native-screens": "3.31.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0"
+  },
+  "private": true
 }
