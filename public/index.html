@@ -3,409 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiberoFlow - Spazio di Flusso Quotidiano</title>
+    <title>LiberoFlow - Habit Tracker</title>
+    <!-- Tailwind CSS CDN per un design moderno e pulito -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg-color: #0f1015;
-            --card-bg: #181a20;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --accent: #2563eb;
-            --accent-hover: #1d4ed8;
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
-            --text-completed: #6b7280;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            padding: 2rem 1rem;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 480px;
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        /* Hevy Style Header */
-        .hevy-header {
-            display: flex;
-            align-items: center;
-            background-color: var(--card-bg);
-            padding: 1.25rem;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-        }
-
-        .app-icon-container {
-            width: 52px;
-            height: 52px;
-            background-color: #12141a;
-            border-radius: 14px;
-            position: relative;
-            margin-right: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            flex-shrink: 0;
-        }
-
-        .shape-vertical {
-            position: absolute;
-            width: 7px;
-            height: 24px;
-            background: #ffffff;
-            border-radius: 3px;
-            left: 12px;
-            top: 6px;
-        }
-
-        .shape-horizontal {
-            position: absolute;
-            width: 20px;
-            height: 7px;
-            background: #ffffff;
-            border-radius: 3px;
-            left: 12px;
-            bottom: 6px;
-        }
-
-        .shape-accent {
-            position: absolute;
-            width: 7px;
-            height: 7px;
-            background: var(--accent);
-            border-radius: 50%;
-            top: 6px;
-            right: 10px;
-        }
-
-        .header-text-container {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
-            letter-spacing: -0.025em;
-        }
-
-        .header-subtitle {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        /* Progress Card */
-        .progress-card {
-            background-color: var(--card-bg);
-            padding: 1.25rem;
-            border-radius: 14px;
-            border: 1px solid var(--border-color);
-        }
-
-        .progress-text {
-            color: var(--text-main);
-            font-size: 0.85rem;
-            margin-bottom: 0.75rem;
-            font-weight: 600;
-        }
-
-        .progress-bar-bg {
-            height: 8px;
-            background-color: #12141a;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background-color: var(--accent);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        /* Input Container */
-        .input-container {
-            display: flex;
-            gap: 0.625rem;
-        }
-
-        .input {
-            flex: 1;
-            background-color: var(--card-bg);
-            color: var(--text-main);
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            border: 1px solid var(--border-color);
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .input:focus {
-            border-color: var(--accent);
-        }
-
-        .input::placeholder {
-            color: #6b7280;
-        }
-
-        .add-button {
-            background-color: var(--accent);
-            color: var(--text-main);
-            border: none;
-            width: 48px;
-            border-radius: 12px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s;
-        }
-
-        .add-button:hover {
-            background-color: var(--accent-hover);
-        }
-
-        /* Habit List */
-        .list-container {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            padding-bottom: 2rem;
-        }
-
-        .habit-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: var(--card-bg);
-            padding: 1rem 1.25rem;
-            border-radius: 14px;
-            border: 1px solid var(--border-color);
-            transition: border-color 0.2s;
-        }
-
-        .habit-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex: 1;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .checkbox {
-            width: 22px;
-            height: 22px;
-            border-radius: 6px;
-            border: 2px solid #4b5563;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-
-        .habit-card.completed .checkbox {
-            background-color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .checkmark {
-            color: var(--text-main);
-            font-size: 0.8rem;
-            font-weight: bold;
-            display: none;
-        }
-
-        .habit-card.completed .checkmark {
-            display: block;
-        }
-
-        .habit-icon {
-            font-size: 1.1rem;
-        }
-
-        .habit-title {
-            color: var(--text-main);
-            font-size: 0.95rem;
-            flex: 1;
-            transition: color 0.2s, text-decoration 0.2s;
-        }
-
-        .habit-card.completed .habit-title {
-            color: var(--text-completed);
-            text-decoration: line-through;
-        }
-
-        .delete-btn {
-            background: none;
-            border: none;
-            color: #6b7280;
-            font-size: 1.1rem;
-            cursor: pointer;
-            padding-left: 0.75rem;
-            transition: color 0.2s;
-        }
-
-        .delete-btn:hover {
-            color: #ef4444;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .card-glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
-    <div class="container">
-        <!-- Header Hevy Style -->
-        <header class="hevy-header">
-            <div class="app-icon-container">
-                <div class="shape-vertical"></div>
-                <div class="shape-horizontal"></div>
-                <div class="shape-accent"></div>
+    <!-- Header -->
+    <header class="card-glass border-b border-slate-800 sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
+                <i class="fa-solid fa-bolt text-white text-xl"></i>
             </div>
-            <div class="header-text-container">
-                <h1 class="header-title">LiberoFlow</h1>
-                <p class="header-subtitle">Il tuo spazio di flusso quotidiano</p>
+            <div>
+                <h1 class="text-xl font-extrabold tracking-tight text-white">LiberoFlow</h1>
+                <p class="text-xs text-slate-400">Traccia le tue abitudini quotidiane</p>
             </div>
-        </header>
+        </div>
+        <div id="current-date" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-800 text-indigo-400 border border-slate-700"></div>
+    </header>
 
-        <!-- Progress Card -->
-        <section class="progress-card">
-            <div class="progress-text" id="progress-text">Completate: 0 su 0</div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="progress-bar"></div>
+    <!-- Main Content -->
+    <main class="flex-1 max-w-3xl w-full mx-auto p-6 space-y-6">
+        
+        <!-- Statistiche rapide -->
+        <div class="grid grid-cols-2 gap-4">
+            <div class="card-glass p-4 rounded-2xl border border-slate-800">
+                <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Completate Oggi</div>
+                <div id="completed-count" class="text-3xl font-extrabold text-white mt-1">0 / 0</div>
             </div>
-        </section>
-
-        <!-- Input New Habit -->
-        <div class="input-container">
-            <input type="text" id="habit-input" class="input" placeholder="Aggiungi una nuova abitudine..." autocomplete="off">
-            <button class="add-button" id="add-btn">+</button>
+            <div class="card-glass p-4 rounded-2xl border border-slate-800">
+                <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Streak Globale</div>
+                <div id="streak-count" class="text-3xl font-extrabold text-indigo-400 mt-1">🔥 0 giorni</div>
+            </div>
         </div>
 
-        <!-- Habits List -->
-        <div class="list-container" id="habit-list">
-            <!-- Populated via JavaScript -->
+        <!-- Sezione Aggiungi Abitudine -->
+        <div class="card-glass p-5 rounded-2xl border border-slate-800 shadow-xl">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-3"><i class="fa-solid fa-plus-circle mr-2 text-indigo-500"></i>Nuova Abitudine</h2>
+            <form id="habit-form" class="flex gap-3">
+                <input type="text" id="habit-input" placeholder="Es. Studiare medicina, Allenamento..." required
+                    class="flex-1 bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/30 transition">
+                    Aggiungi
+                </button>
+            </form>
         </div>
-    </div>
 
+        <!-- Lista Abitudini -->
+        <div class="space-y-3">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 px-1">Le tue abitudini</h2>
+            <div id="habits-list" class="space-y-3">
+                <!-- Verranno inserite dinamicamente -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Script di gestione -->
     <script>
-        const STORAGE_KEY = 'liberoflow_habits_web_v1';
+        // Gestione data odierna
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('it-IT', options);
 
-        let habits = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
-            { id: '1', title: 'Sessione di Studio / Università', category: 'studio', completed: false },
-            { id: '2', title: 'Programmazione & Codice', category: 'code', completed: false },
-            { id: '3', title: 'Attività Fisica & Movimento', category: 'fitness', completed: false }
+        // Caricamento dati da localStorage
+        let habits = JSON.parse(localStorage.getItem('liberoflow_habits')) || [
+            { id: 1, name: 'Studio Semestre Filtro (Biologia/Chimica)', completed: false },
+            { id: 2, name: 'Sessione di programmazione', completed: false }
         ];
 
-        const habitListEl = document.getElementById('habit-list');
-        const habitInputEl = document.getElementById('habit-input');
-        const addBtnEl = document.getElementById('add-btn');
-        const progressTextEl = document.getElementById('progress-text');
-        const progressBarEl = document.getElementById('progress-bar');
-
-        function saveAndRender() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
-            render();
+        function saveData() {
+            localStorage.setItem('liberoflow_habits', JSON.stringify(habits));
+            renderHabits();
         }
 
-        function getCategoryIcon(category) {
-            switch (category) {
-                case 'studio': return '📚';
-                case 'code': return '💻';
-                case 'fitness': return '⚡';
-                default: return '🎯';
-            }
+        function toggleHabit(id) {
+            habits = habits.map(h => h.id === id ? { ...h, completed: !h.completed } : h);
+            saveData();
         }
 
-        function render() {
-            habitListEl.innerHTML = '';
+        function deleteHabit(id) {
+            habits = habits.filter(h => h.id !== id);
+            saveData();
+        }
+
+        function renderHabits() {
+            const listEl = document.getElementById('habits-list');
+            listEl.innerHTML = '';
             
-            let completedCount = 0;
+            if (habits.length === 0) {
+                listEl.innerHTML = `<div class="text-center py-10 text-slate-500 text-sm">Nessuna abitudine inserita. Aggiungine una qui sopra!</div>`;
+                document.getElementById('completed-count').innerText = `0 / 0`;
+                return;
+            }
 
+            let completed = 0;
             habits.forEach(habit => {
-                if (habit.completed) completedCount++;
-
-                const card = document.createElement('div');
-                card.className = `habit-card ${habit.completed ? 'completed' : ''}`;
-                
-                card.innerHTML = `
-                    <div class="habit-info" onclick="toggleHabit('${habit.id}')">
-                        <div class="checkbox">
-                            <span class="checkmark">✓</span>
+                if (habit.completed) completed++;
+                const div = document.createElement('div');
+                div.className = `card-glass p-4 rounded-2xl flex items-center justify-between border transition ${habit.completed ? 'border-emerald-500/40 bg-emerald-950/10' : 'border-slate-800'}`;
+                div.innerHTML = `
+                    <div class="flex items-center space-x-4 cursor-pointer flex-1" onclick="toggleHabit(${habit.id})">
+                        <div class="w-7 h-7 rounded-lg border-2 flex items-center justify-center transition ${habit.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-600 bg-slate-900'}">
+                            ${habit.completed ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
                         </div>
-                        <span class="habit-icon">${getCategoryIcon(habit.category)}</span>
-                        <span class="habit-title">${escapeHtml(habit.title)}</span>
+                        <span class="text-sm font-medium ${habit.completed ? 'line-through text-slate-400' : 'text-white'}">${habit.name}</span>
                     </div>
-                    <button class="delete-btn" onclick="deleteHabit('${habit.id}')">✕</button>
+                    <button onclick="deleteHabit(${habit.id})" class="text-slate-500 hover:text-red-400 p-2 transition">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </button>
                 `;
-
-                habitListEl.appendChild(card);
+                listEl.appendChild(div);
             });
 
-            // Update Progress
-            const total = habits.length;
-            const percentage = total > 0 ? (completedCount / total) * 100 : 0;
-            progressTextEl.textContent = `Completate: ${completedCount} su ${total}`;
-            progressBarEl.style.width = `${percentage}%`;
+            document.getElementById('completed-count').innerText = `${completed} / ${habits.length}`;
         }
 
-        function addHabit() {
-            const text = habitInputEl.value.trim();
-            if (!text) return;
-
-            const newHabit = {
-                id: Date.now().toString(),
-                title: text,
-                category: 'general',
+        document.getElementById('habit-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('habit-input');
+            if (input.value.trim() === '') return;
+            
+            habits.push({
+                id: Date.now(),
+                name: input.value.trim(),
                 completed: false
-            };
-
-            habits.push(newHabit);
-            habitInputEl.value = '';
-            saveAndRender();
-        }
-
-        window.toggleHabit = function(id) {
-            habits = habits.map(h => h.id === id ? { ...h, completed: !h.completed } : h);
-            saveAndRender();
-        }
-
-        window.deleteHabit = function(id) {
-            habits = habits.filter(h => h.id !== id);
-            saveAndRender();
-        }
-
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.replace(/[&<>"']/g, m => map[m]);
-        }
-
-        addBtnEl.addEventListener('click', addHabit);
-        habitInputEl.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addHabit();
+            });
+            
+            input.value = '';
+            saveData();
         });
 
-        // Initial render
-        render();
+        // Primo rendering
+        renderHabits();
     </script>
 </body>
 </html>
