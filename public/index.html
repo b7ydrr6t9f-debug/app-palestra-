@@ -1,246 +1,294 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitness & Health Tracker</title>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --border: #e2e8f0;
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ApexFitness — Elite Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        zinc: {
+                            850: '#1f1f23',
+                            900: '#18181b',
+                            950: '#09090b',
+                        }
+                    }
+                }
+            }
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 70px; }
-        header { background: var(--primary); color: white; padding: 1rem; text-align: center; font-size: 1.25rem; font-weight: bold; }
-        .container { padding: 1rem; max-width: 600px; margin: 0 auto; }
-        .card { background: var(--card-bg); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
-        h2 { font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--primary); }
-        label { display: block; font-size: 0.85rem; margin-bottom: 0.25rem; color: #64748b; }
-        input, select { width: 100%; padding: 0.65rem; margin-bottom: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
-        button { width: 100%; background: var(--primary); color: white; border: none; padding: 0.75rem; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
-        button:active { opacity: 0.9; }
-        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 0.5rem 0; z-index: 1000; }
-        .nav-item { text-align: center; font-size: 0.75rem; color: #64748b; cursor: pointer; flex: 1; }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
-        .section { display: none; }
-        .section.active { display: block; }
-        .list-item { font-size: 0.9rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-zinc-950">
 
-    <header>Fitness Tracker Mobile</header>
-
-    <div class="container">
-        <!-- SEZIONE ALLENAMENTO -->
-        <div id="sec-workout" class="section active">
-            <div class="card">
-                <h2>Registra Allenamento</h2>
-                <form id="workout-form">
-                    <label>Data</label>
-                    <input type="date" id="w-date" required>
-                    
-                    <label>Tipo di Allenamento</label>
-                    <select id="w-type">
-                        <option value="Serie Semplici">Serie Semplici</option>
-                        <option value="Super Serie">Super Serie</option>
-                        <option value="Cardio">Cardio</option>
-                    </select>
-
-                    <label>Esercizio</label>
-                    <input type="text" id="w-exercise" placeholder="es. Panca piana / Squat" required>
-
-                    <label>Serie</label>
-                    <input type="number" id="w-sets" placeholder="es. 4">
-
-                    <label>Ripetizioni</label>
-                    <input type="number" id="w-reps" placeholder="es. 10">
-
-                    <label>Peso (kg)</label>
-                    <input type="number" step="0.5" id="w-weight" placeholder="es. 50">
-
-                    <label>Calorie Bruciate Stimate</label>
-                    <input type="number" id="w-calories" placeholder="es. 300">
-
-                    <button type="submit">Salva Allenamento</button>
-                </form>
+    <!-- Top Header -->
+    <header class="sticky top-0 z-40 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/80 px-4 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-bold text-lg shadow-lg shadow-emerald-500/20">
+                A
             </div>
-            <div class="card">
-                <h2>Storico Allenamenti</h2>
-                <div id="workout-list">Caricamento...</div>
+            <div>
+                <h1 class="text-sm font-bold tracking-tight leading-none">ApexFitness</h1>
+                <span class="text-[10px] text-emerald-400 font-medium tracking-wide uppercase">Pro Edition</span>
             </div>
         </div>
-
-        <!-- SEZIONE MISURE E CALENDARIO -->
-        <div id="sec-measurements" class="section">
-            <div class="card">
-                <h2>Misure Settimanali (Vita & Petto)</h2>
-                <form id="measure-form">
-                    <label>Calendario (Seleziona la settimana)</label>
-                    <input type="date" id="m-date" required>
-
-                    <label>Circonferenza Vita (cm)</label>
-                    <input type="number" step="0.1" id="m-waist" placeholder="es. 80" required>
-
-                    <label>Circonferenza Petto (cm)</label>
-                    <input type="number" step="0.1" id="m-chest" placeholder="es. 100" required>
-
-                    <label>Peso Corporeo (kg)</label>
-                    <input type="number" step="0.1" id="m-weight" placeholder="es. 75">
-
-                    <button type="submit">Registra Misure Settimanali</button>
-                </form>
-            </div>
-            <div class="card">
-                <h2>Andamento Settimanale</h2>
-                <div id="measure-list">Caricamento...</div>
-            </div>
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1.5"></span> Live
+            </span>
         </div>
+    </header>
 
-        <!-- SEZIONE BILANCIO ENERGETICO (DEFICIT / SURPLUS) -->
-        <div id="sec-nutrition" class="section">
-            <div class="card">
-                <h2>Bilancio Calorico & Peso</h2>
-                <form id="nutrition-form">
-                    <label>Data</label>
-                    <input type="date" id="n-date" required>
+    <!-- Main Container / Dynamic Views -->
+    <main class="flex-1 max-w-md w-full mx-auto p-4 pb-28 hide-scrollbar overflow-y-auto">
 
-                    <label>Calorie Assunte (Introitate)</label>
-                    <input type="number" id="n-in" placeholder="es. 2200" required>
-
-                    <label>Calorie Consumate (Totali bruciate)</label>
-                    <input type="number" id="n-out" placeholder="es. 2500" required>
-
-                    <button type="submit">Calcola & Salva</button>
-                </form>
-            </div>
-            <div class="card">
-                <h2>Report Deficit / Surplus</h2>
-                <div id="nutrition-list">Caricamento...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- NAVBAR INFERIORE -->
-    <div class="nav-bar">
-        <div class="nav-item active" onclick="switchTab('workout', event)">Allenamento</div>
-        <div class="nav-item" onclick="switchTab('measurements', event)">Misure</div>
-        <div class="nav-item" onclick="switchTab('nutrition', event)">Nutrizione</div>
-    </div>
-
-    <script>
-        // Gestione Tab Mobile
-        function switchTab(tabId, event) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('sec-' + tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
-
-        // Imposta date di default a oggi
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('w-date').value = today;
-        document.getElementById('m-date').value = today;
-        document.getElementById('n-date').value = today;
-
-        // Fetch e rendering dati
-        async function loadData() {
-            // Allenamenti
-            const resW = await fetch('/api/workouts');
-            const workouts = await resW.json();
-            document.getElementById('workout-list').innerHTML = workouts.map(w => `
-                <div class="list-item">
-                    <strong>${w.date}</strong> - [${w.type}] <b>${w.exercise}</b><br>
-                    Set: ${w.sets} | Reps: ${w.reps} | Peso: ${w.weight}kg | Bruciate: ${w.calories || 0} kcal
-                </div>
-            `).join('') || 'Nessun allenamento registrato.';
-
-            // Misure
-            const resM = await fetch('/api/measurements');
-            const measurements = await resM.json();
-            document.getElementById('measure-list').innerHTML = measurements.map(m => `
-                <div class="list-item">
-                    📅 Settimana del: <strong>${m.week_date}</strong><br>
-                    🔹 Vita: <b>${m.waist} cm</b> | 🔸 Petto: <b>${m.chest} cm</b> | ⚖️ Peso: ${m.weight} kg
-                </div>
-            `).join('') || 'Nessuna misura registrata.';
-
-            // Nutrizione
-            const resN = await fetch('/api/nutrition');
-            const nutrition = await resN.json();
-            document.getElementById('nutrition-list').innerHTML = nutrition.map(n => {
-                const diff = n.calories_in - n.calories_out;
-                const status = diff <= 0 ? `<span style="color:green">Deficit (${Math.abs(diff)} kcal)</span>` : `<span style="color:orange">Surplus (+${diff} kcal)</span>`;
-                return `
-                    <div class="list-item">
-                        <strong>${n.date}</strong><br>
-                        Entrate: ${n.calories_in} kcal | Uscite: ${n.calories_out} kcal<br>
-                        Bilancio: ${status}
+        <!-- VIEW 1: DASHBOARD -->
+        <section id="view-dashboard" class="space-y-4">
+            <!-- Calorie & Deficit Card -->
+            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Bilancio Energetico</span>
+                        <h2 class="text-xl font-bold tracking-tight text-white mt-0.5">Deficit & Calorie</h2>
                     </div>
-                `;
-            }).join('') || 'Nessun dato nutrizionale.';
+                    <span id="badge-status" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">In Deficit</span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-800/60">
+                    <div>
+                        <span class="text-[11px] text-zinc-400 block font-medium">Consunte Oggi</span>
+                        <span id="stat-calories" class="text-2xl font-bold text-white">0 <span class="text-xs font-normal text-zinc-400">kcal</span></span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-zinc-400 block font-medium">Stima Bruciate</span>
+                        <span id="stat-burned" class="text-2xl font-bold text-emerald-400">0 <span class="text-xs font-normal text-zinc-400">kcal</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Action Banner -->
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-5 text-zinc-950 shadow-lg shadow-emerald-900/20 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-base leading-tight">Pronto per il workout?</h3>
+                    <p class="text-xs text-emerald-950 font-medium mt-0.5">Traccia serie, super serie e intensità.</p>
+                </div>
+                <button onclick="switchTab('workout')" class="bg-zinc-950 text-emerald-400 font-semibold px-4 py-2.5 rounded-xl text-xs hover:bg-zinc-900 transition active:scale-95 shadow-md">
+                    Avvia
+                </button>
+            </div>
+
+            <!-- Recent Workouts Header -->
+            <div class="flex items-center justify-between pt-2">
+                <h3 class="text-sm font-bold text-zinc-200 uppercase tracking-wider">Attività Recenti</h3>
+                <span class="text-xs text-zinc-400" id="workout-count">0 registrati</span>
+            </div>
+
+            <!-- Workout List Container -->
+            <div id="workouts-list" class="space-y-2.5">
+                <!-- Empty state iniziale -->
+                <div class="text-center py-10 bg-zinc-900/50 border border-dashed border-zinc-800 rounded-2xl">
+                    <p class="text-xs text-zinc-400">Nessun allenamento registrato.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: WORKOUT TRACKER -->
+        <section id="view-workout" class="space-y-4 hidden">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 shadow-xl">
+                <h2 class="text-lg font-bold text-white mb-1">Nuovo Allenamento</h2>
+                <p class="text-xs text-zinc-400 mb-4">Seleziona la tipologia e compila i dati della sessione.</p>
+                
+                <form id="workout-form" class="space-y-4" onsubmit="saveWorkout(event)">
+                    <div>
+                        <label class="block text-xs font-medium text-zinc-300 mb-1.5">Tipo di Allenamento</label>
+                        <select id="workout-type" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
+                            <option value="Serie Semplici">Serie Semplici</option>
+                            <option value="Super Serie">Super Serie</option>
+                            <option value="Cardio / HIIT">Cardio / HIIT</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-zinc-300 mb-1.5">Categoria / Gruppo Muscolare</label>
+                        <input type="text" id="workout-category" required placeholder="Es. Petto e Tricipiti" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-300 mb-1.5">Durata (min)</label>
+                            <input type="number" id="workout-duration" required placeholder="45" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-300 mb-1.5">Calorie Stimate (kcal)</label>
+                            <input type="number" id="workout-calories" required placeholder="350" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500 transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-zinc-300 mb-1.5">Note della Sessione</label>
+                        <textarea id="workout-notes" rows="2" placeholder="Sensazioni, carichi utilizzati..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500 transition"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-500 text-zinc-950 font-bold py-3 rounded-xl text-sm hover:bg-emerald-400 transition active:scale-95 shadow-lg shadow-emerald-500/20">
+                        Salva Allenamento
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW 3: AI ASSISTANT -->
+        <section id="view-ai" class="space-y-4 hidden">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 shadow-xl flex flex-col h-[70vh]">
+                <div class="mb-3">
+                    <h2 class="text-lg font-bold text-white">Apex AI Coach</h2>
+                    <p class="text-xs text-zinc-400">Chiedi consigli su esercizi, schede o nutrizione.</p>
+                </div>
+                
+                <div id="ai-chat-box" class="flex-1 bg-zinc-950 border border-zinc-800/80 rounded-xl p-3.5 overflow-y-auto space-y-3 mb-3 text-sm">
+                    <div class="bg-zinc-900 border border-zinc-800/60 p-3 rounded-xl text-zinc-300 max-w-[85%]">
+                        Ciao! Sono il tuo assistente fitness basato su Gemini. Come posso aiutarti oggi con il tuo piano di allenamento o la dieta?
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <input type="text" id="ai-input" placeholder="Scrivi una domanda..." class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500 transition" onkeydown="if(event.key==='KeyEnter'||event.keyCode===13)askAI()">
+                    <button onclick="askAI()" class="bg-emerald-500 text-zinc-950 px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-emerald-400 transition active:scale-95">
+                        Invia
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-zinc-950/90 backdrop-blur-lg border-t border-zinc-800/80 px-6 py-2.5 flex justify-between items-center z-50">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-emerald-400 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span class="text-[10px] font-semibold">Home</span>
+        </button>
+        <button onclick="switchTab('workout')" id="nav-workout" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-200 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            <span class="text-[10px] font-semibold">Workout</span>
+        </button>
+        <button onclick="switchTab('ai')" id="nav-ai" class="flex flex-col items-center gap-1 text-zinc-400 hover:text-zinc-200 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span class="text-[10px] font-semibold">AI Coach</span>
+        </button>
+    </nav>
+
+    <!-- Client Script -->
+    <script>
+        function switchTab(tabName) {
+            ['dashboard', 'workout', 'ai'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                const navBtn = document.getElementById(`nav-${t}`);
+                navBtn.classList.remove('text-emerald-400');
+                navBtn.classList.add('text-zinc-400');
+            });
+
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            activeNav.classList.remove('text-zinc-400');
+            activeNav.classList.add('text-emerald-400');
+
+            if(tabName === 'dashboard') loadWorkouts();
         }
 
-        // Invio form Allenamento
-        document.getElementById('workout-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await fetch('/api/workouts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    date: document.getElementById('w-date').value,
-                    type: document.getElementById('w-type').value,
-                    exercise: document.getElementById('w-exercise').value,
-                    sets: document.getElementById('w-sets').value,
-                    reps: document.getElementById('w-reps').value,
-                    weight: document.getElementById('w-weight').value,
-                    calories: document.getElementById('w-calories').value
-                })
-            });
-            document.getElementById('workout-form').reset();
-            document.getElementById('w-date').value = today;
-            loadData();
-        });
+        async function loadWorkouts() {
+            try {
+                const res = await fetch('/api/workouts');
+                const workouts = await res.json();
+                const listEl = document.getElementById('workouts-list');
+                document.getElementById('workout-count').innerText = `${workouts.length} registrati`;
 
-        // Invio form Misure
-        document.getElementById('measure-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await fetch('/api/measurements', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    week_date: document.getElementById('m-date').value,
-                    waist: document.getElementById('m-waist').value,
-                    chest: document.getElementById('m-chest').value,
-                    weight: document.getElementById('m-weight').value
-                })
-            });
-            document.getElementById('measure-form').reset();
-            document.getElementById('m-date').value = today;
-            loadData();
-        });
+                let totalBurned = 0;
+                workouts.forEach(w => totalBurned += (w.calories || 0));
+                document.getElementById('stat-burned').innerHTML = `${totalBurned} <span class="text-xs font-normal text-zinc-400">kcal</span>`;
 
-        // Invio form Nutrizione
-        document.getElementById('nutrition-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await fetch('/api/nutrition', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    date: document.getElementById('n-date').value,
-                    calories_in: document.getElementById('n-in').value,
-                    calories_out: document.getElementById('n-out').value
-                })
-            });
-            document.getElementById('nutrition-form').reset();
-            document.getElementById('n-date').value = today;
-            loadData();
-        });
+                if (workouts.length === 0) {
+                    listEl.innerHTML = `<div class="text-center py-10 bg-zinc-900/50 border border-dashed border-zinc-800 rounded-2xl"><p class="text-xs text-zinc-400">Nessun allenamento registrato.</p></div>`;
+                    return;
+                }
 
-        loadData();
+                listEl.innerHTML = workouts.map(w => `
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3.5 flex items-center justify-between shadow-sm">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-white">${w.workout_category}</span>
+                                <span class="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-md font-medium">${w.type}</span>
+                            </div>
+                            <p class="text-[11px] text-zinc-400 mt-0.5">${w.duration} min • ${w.calories} kcal</p>
+                        </div>
+                        <span class="text-xs text-emerald-400 font-semibold">${w.date || 'Oggi'}</span>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error("Errore caricamento allenamenti:", err);
+            }
+        }
+
+        async function saveWorkout(e) {
+            e.preventDefault();
+            const data = {
+                date: new Date().toLocaleDateString('it-IT'),
+                type: document.getElementById('workout-type').value,
+                workout_category: document.getElementById('workout-category').value,
+                duration: parseInt(document.getElementById('workout-duration').value),
+                calories: parseInt(document.getElementById('workout-calories').value),
+                notes: document.getElementById('workout-notes').value
+            };
+
+            try {
+                const res = await fetch('/api/workouts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if(res.ok) {
+                    document.getElementById('workout-form').reset();
+                    switchTab('dashboard');
+                }
+            } catch (err) {
+                console.error("Errore salvataggio:", err);
+            }
+        }
+
+        async function askAI() {
+            const inputEl = document.getElementById('ai-input');
+            const chatBox = document.getElementById('ai-chat-box');
+            const question = inputEl.value.trim();
+            if(!question) return;
+
+            chatBox.innerHTML += `<div class="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl text-emerald-200 ml-auto max-w-[85%] text-right">${question}</div>`;
+            inputEl.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const res = await fetch('/api/ask-ai', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                });
+                const data = await res.json();
+                chatBox.innerHTML += `<div class="bg-zinc-900 border border-zinc-800/60 p-3 rounded-xl text-zinc-300 max-w-[85%]">${data.answer || data.error}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } catch (err) {
+                chatBox.innerHTML += `<div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-red-300 max-w-[85%]">Errore di connessione all'AI.</div>`;
+            }
+        }
+
+        loadWorkouts();
     </script>
 </body>
 </html>
