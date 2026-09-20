@@ -9,8 +9,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
-  Image
+  Alert
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
@@ -97,13 +96,14 @@ export default function App() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.innerContainer}
       >
-        {/* Banner Immagine Professionale */}
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop' }}
-            style={styles.headerImage}
-          />
-          <View style={styles.imageOverlay}>
+        {/* Header Stile Hevy (Geometrico e Minimale) */}
+        <View style={styles.hevyHeader}>
+          <View style={styles.appIconContainer}>
+            <View style={styles.shapeVertical} />
+            <View style={styles.shapeHorizontal} />
+            <View style={styles.shapeAccent} />
+          </View>
+          <View style={styles.headerTextContainer}>
             <Text style={styles.headerTitle}>LiberoFlow</Text>
             <Text style={styles.headerSubtitle}>Il tuo spazio di flusso quotidiano</Text>
           </View>
@@ -173,48 +173,88 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121214',
+    backgroundColor: '#0f1015',
   },
   innerContainer: {
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 10,
   },
-  imageContainer: {
-    height: 130,
-    borderRadius: 14,
-    overflow: 'hidden',
+  /* Stili Header Hevy Style */
+  hevyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#181a20',
+    padding: 16,
+    borderRadius: 16,
     marginBottom: 20,
-    position: 'relative',
     borderWidth: 1,
-    borderColor: '#27272a',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
-  headerImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  imageOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(18, 18, 20, 0.75)',
+  appIconContainer: {
+    width: 52,
+    height: 52,
+    backgroundColor: '#12141a',
+    borderRadius: 14,
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    alignItems: 'center',
+    position: 'relative',
+    marginRight: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  shapeVertical: {
+    position: 'absolute',
+    width: 7,
+    height: 24,
+    backgroundColor: '#ffffff',
+    borderRadius: 3,
+    left: 12,
+    top: 6,
+  },
+  shapeHorizontal: {
+    position: 'absolute',
+    width: 20,
+    height: 7,
+    backgroundColor: '#ffffff',
+    borderRadius: 3,
+    left: 12,
+    bottom: 6,
+  },
+  shapeAccent: {
+    position: 'absolute',
+    width: 7,
+    height: 7,
+    backgroundColor: '#2563eb',
+    borderRadius: 3.5,
+    top: 6,
+    right: 10,
+  },
+  headerTextContainer: {
+    flex: 1,
   },
   headerTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '700',
     color: '#ffffff',
+    letterSpacing: -0.5,
   },
   headerSubtitle: {
-    fontSize: 13,
-    color: '#a1a1aa',
+    fontSize: 12,
+    color: '#9ca3af',
     marginTop: 2,
   },
   progressCard: {
-    backgroundColor: '#1f1f23',
+    backgroundColor: '#181a20',
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 14,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   progressText: {
     color: '#ffffff',
@@ -224,13 +264,13 @@ const styles = StyleSheet.create({
   },
   progressBarBackground: {
     height: 8,
-    backgroundColor: '#27272a',
+    backgroundColor: '#12141a',
     borderRadius: 4,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#2563eb',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -238,21 +278,21 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: '#1f1f23',
+    backgroundColor: '#181a20',
     color: '#ffffff',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 12,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#27272a',
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   addButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#2563eb',
     justifyContent: 'center',
     alignItems: 'center',
     width: 50,
-    borderRadius: 10,
+    borderRadius: 12,
     marginLeft: 10,
   },
   addButtonText: {
@@ -265,14 +305,14 @@ const styles = StyleSheet.create({
   },
   habitCard: {
     flexDirection: 'row',
-    backgroundColor: '#1f1f23',
+    backgroundColor: '#181a20',
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#27272a',
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   habitInfo: {
     flexDirection: 'row',
@@ -284,14 +324,14 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 6,
     borderWidth: 2,
-    borderColor: '#52525b',
+    borderColor: '#4b5563',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
+    marginRight: 12,
   },
   checkboxCompleted: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6',
+    backgroundColor: '#2563eb',
+    borderColor: '#2563eb',
   },
   checkmark: {
     color: '#ffffff',
@@ -308,11 +348,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   habitTitleCompleted: {
-    color: '#71717a',
+    color: '#6b7280',
     textDecorationLine: 'line-through',
   },
   deleteText: {
-    color: '#71717a',
+    color: '#6b7280',
     fontSize: 18,
     paddingLeft: 10,
   },
