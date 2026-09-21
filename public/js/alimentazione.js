@@ -26,18 +26,18 @@ function mostraErroreCibo(msg) {
     el.classList.remove('hidden');
 }
 
-async function stimaEAggiungiPasto(descrizione) {
+async function stimaEAggiungiPasto(alimento, peso, immagineBase64) {
     const res = await fetch('/api/stima-calorie', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ descrizione })
+        body: JSON.stringify({ alimento, peso, immagine: immagineBase64 || null })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.errore || 'Stima non riuscita.');
+    if (!res.ok) throw new Error(data.dettaglio || data.errore || 'Stima non riuscita.');
 
     const pasti = leggiPastiOggi();
     pasti.push({
         id: Date.now(),
-        nome: data.nome || descrizione,
+        nome: data.nome || alimento,
         calorie: Math.round(data.calorie),
         proteine: data.proteine_g || 0,
         carboidrati: data.carboidrati_g || 0,
@@ -46,6 +46,16 @@ async function stimaEAggiungiPasto(descrizione) {
     });
     salvaPastiOggi(pasti);
     renderAlimentazione();
+}
+
+// Converte il file immagine scelto in una data URL base64 da mandare al server
+function leggiFileComeDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
 }
 
 function eliminaPasto(id) {
@@ -120,25 +130,48 @@ function renderAlimentazione() {
     `).join('');
 }
 
+document.getElementById('food-etichetta').addEventListener('change', (e) => {
+    const testo = document.getElementById('food-etichetta-testo');
+    const label = document.getElementById('food-label-etichetta');
+    if (e.target.files[0]) {
+        testo.textContent = `📎 ${e.target.files[0].name}`;
+        label.classList.add('border-amber-500/60', 'text-amber-300');
+    } else {
+        testo.textContent = "Hai l'etichetta nutrizionale? Aggiungi una foto per una stima più precisa (opzionale)";
+        label.classList.remove('border-amber-500/60', 'text-amber-300');
+    }
+});
+
 document.getElementById('food-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const input = document.getElementById('food-input');
+    const alimentoInput = document.getElementById('food-alimento');
+    const pesoInput = document.getElementById('food-peso');
+    const fileInput = document.getElementById('food-etichetta');
     const btn = document.getElementById('food-submit-btn');
-    const descrizione = input.value.trim();
-    if (!descrizione) return;
+
+    const alimento = alimentoInput.value.trim();
+    const peso = pesoInput.value;
+    if (!alimento || !peso) return;
 
     document.getElementById('food-errore').classList.add('hidden');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Stima in corso...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Aggiunta in corso...';
 
     try {
-        await stimaEAggiungiPasto(descrizione);
-        input.value = '';
+        let immagineBase64 = null;
+        if (fileInput.files[0]) immagineBase64 = await leggiFileComeDataUrl(fileInput.files[0]);
+
+        await stimaEAggiungiPasto(alimento, peso, immagineBase64);
+        alimentoInput.value = '';
+        pesoInput.value = '';
+        fileInput.value = '';
+        document.getElementById('food-etichetta-testo').textContent = "Hai l'etichetta nutrizionale? Aggiungi una foto per una stima più precisa (opzionale)";
+        document.getElementById('food-label-etichetta').classList.remove('border-amber-500/60', 'text-amber-300');
     } catch (err) {
         mostraErroreCibo(err.message);
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Stima';
+        btn.innerHTML = '<i class="fa-solid fa-plus"></i> Aggiungi alimento';
     }
 });
 

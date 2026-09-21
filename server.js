@@ -8,7 +8,7 @@ const app = express();
 
 const PORT = process.env.PORT || 10000;
 
-app.use(express.json());
+app.use(express.json({ limit: '8mb' })); // foto dell'etichetta nutrizionale come base64
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Database: usa Turso se TURSO_DATABASE_URL è configurata, altrimenti un
@@ -102,14 +102,19 @@ app.put('/api/checkin/:id', async (req, res) => {
   }
 });
 
-// Chiama l'API Gemini con un prompt che deve rispondere in JSON puro.
-function chiediAGemini(promptText) {
+// Chiama l'API Gemini con un prompt (e opzionalmente un'immagine) che deve
+// rispondere in JSON puro. Logga sempre il corpo grezzo della risposta in
+// caso di errore, per non dover più indovinare la causa a occhio.
+function chiediAGemini(promptText, immagine) {
   return new Promise((resolve, reject) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return reject(new Error('GEMINI_API_KEY non configurata sul server.'));
 
+    const parts = [{ text: promptText }];
+    if (immagine) parts.push({ inline_data: { mime_type: immagine.mimeType, data: immagine.base64 } });
+
     const body = JSON.stringify({
-      contents: [{ parts: [{ text: promptText }] }],
+      contents: [{ parts }],
       generationConfig: { responseMimeType: 'application/json' }
     });
 
@@ -122,40 +127,64 @@ function chiediAGemini(promptText) {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
+        if (res.statusCode !== 200) {
+          console.error(`[Gemini] HTTP ${res.statusCode}:`, data);
+          try {
+            return reject(new Error(JSON.parse(data)?.error?.message || `Gemini ha risposto con errore ${res.statusCode}.`));
+          } catch (e) {
+            return reject(new Error(`Gemini ha risposto con errore ${res.statusCode}.`));
+          }
+        }
         try {
           const parsed = JSON.parse(data);
           const testo = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (!testo) return reject(new Error(parsed?.error?.message || 'Risposta vuota da Gemini.'));
+          if (!testo) {
+            console.error('[Gemini] Risposta senza testo:', data);
+            return reject(new Error(parsed?.error?.message || parsed?.candidates?.[0]?.finishReason || 'Risposta vuota da Gemini.'));
+          }
           resolve(JSON.parse(testo));
         } catch (e) {
+          console.error('[Gemini] Risposta non interpretabile:', data);
           reject(new Error('Risposta di Gemini non interpretabile.'));
         }
       });
     });
-    req.on('error', reject);
+    req.on('error', (e) => { console.error('[Gemini] Errore di rete:', e.message); reject(e); });
     req.write(body);
     req.end();
   });
 }
 
-// Stima calorie e macronutrienti a partire da una descrizione libera di un pasto.
+// Stima calorie e macronutrienti a partire da alimento + peso, con foto
+// opzionale dell'etichetta nutrizionale per una stima molto più precisa
+// (letta direttamente dall'immagine invece che indovinata dal nome).
 app.post('/api/stima-calorie', async (req, res) => {
-  const descrizione = String(req.body.descrizione || '').trim();
-  if (!descrizione) return res.status(400).json({ errore: 'Descrivi cosa hai mangiato.' });
+  const alimento = String(req.body.alimento || '').trim();
+  const peso = String(req.body.peso || '').trim();
+  const immagineBase64 = req.body.immagine; // data URL o base64 puro, opzionale
+  if (!alimento || !peso) return res.status(400).json({ errore: 'Indica alimento e peso.' });
 
-  const prompt = `Sei un nutrizionista. Analizza questa descrizione di un pasto o alimento e stima calorie e macronutrienti, basandoti sulle quantità indicate (se non indicate, assumi una porzione standard).
-Descrizione: "${descrizione}"
+  let immagine = null;
+  if (immagineBase64) {
+    const match = String(immagineBase64).match(/^data:(image\/[a-zA-Z]+);base64,(.+)$/);
+    immagine = match ? { mimeType: match[1], base64: match[2] } : { mimeType: 'image/jpeg', base64: immagineBase64 };
+  }
 
+  const prompt = immagine
+    ? `Sei un nutrizionista. Nell'immagine allegata trovi l'etichetta nutrizionale di un prodotto alimentare (valori per 100g o per porzione). Leggi i valori dall'etichetta e calcola calorie e macronutrienti per una porzione di ${peso} grammi di "${alimento}". Usa i valori reali dell'etichetta, non stimarli.
 Rispondi SOLO con un oggetto JSON con questa struttura esatta, senza testo aggiuntivo:
-{"nome": "nome sintetico dell'alimento/pasto", "calorie": numero_intero, "proteine_g": numero, "carboidrati_g": numero, "grassi_g": numero}`;
+{"nome": "${alimento}", "calorie": numero_intero, "proteine_g": numero, "carboidrati_g": numero, "grassi_g": numero}`
+    : `Sei un nutrizionista. Stima calorie e macronutrienti per ${peso} grammi di "${alimento}".
+Rispondi SOLO con un oggetto JSON con questa struttura esatta, senza testo aggiuntivo:
+{"nome": "${alimento}", "calorie": numero_intero, "proteine_g": numero, "carboidrati_g": numero, "grassi_g": numero}`;
 
   try {
-    const stima = await chiediAGemini(prompt);
+    const stima = await chiediAGemini(prompt, immagine);
     if (typeof stima.calorie !== 'number') throw new Error('Formato di risposta inatteso.');
     res.json(stima);
   } catch (e) {
     console.error('[Calorie] Errore stima:', e.message);
-    res.status(502).json({ errore: 'Non sono riuscito a stimare le calorie. Riprova con una descrizione più chiara.' });
+    res.status(502).json({ errore: 'Non sono riuscito a stimare le calorie. Riprova.', dettaglio: e.message });
   }
 });
 
