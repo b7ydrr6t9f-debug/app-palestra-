@@ -3,12 +3,61 @@ require('dotenv').config();
 const express = require('express');
 const https = require('https');
 const path = require('path');
+const fs = require('fs');
 const app = express();
 
 const PORT = process.env.PORT || 10000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Persistenza su file JSON: funziona, ma su Render (senza Persistent Disk a
+// pagamento) il file viene azzerato a ogni riavvio/deploy del servizio.
+// Per dati che non si possono permettere di sparire, il passo successivo è
+// un database vero (es. Turso, già usato nell'altro progetto).
+const FILE_CHECKIN = path.join(__dirname, 'data-checkin.json');
+
+function leggiCheckin() {
+  try {
+    return JSON.parse(fs.readFileSync(FILE_CHECKIN, 'utf8'));
+  } catch (e) {
+    return [];
+  }
+}
+
+function salvaCheckin(lista) {
+  fs.writeFileSync(FILE_CHECKIN, JSON.stringify(lista, null, 2));
+}
+
+app.get('/api/checkin', (req, res) => {
+  res.json(leggiCheckin());
+});
+
+app.post('/api/checkin', (req, res) => {
+  const { peso, vita, fianchi, petto, braccio, coscia } = req.body;
+  if (!peso) return res.status(400).json({ errore: 'Il peso è obbligatorio.' });
+
+  const lista = leggiCheckin();
+  lista.push({
+    id: Date.now(),
+    data: new Date().toISOString().slice(0, 10),
+    peso: Number(peso),
+    vita: vita ? Number(vita) : null,
+    fianchi: fianchi ? Number(fianchi) : null,
+    petto: petto ? Number(petto) : null,
+    braccio: braccio ? Number(braccio) : null,
+    coscia: coscia ? Number(coscia) : null,
+  });
+  salvaCheckin(lista);
+  res.json({ success: true });
+});
+
+app.delete('/api/checkin/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const lista = leggiCheckin().filter(c => c.id !== id);
+  salvaCheckin(lista);
+  res.json({ success: true });
+});
 
 // Chiama l'API Gemini con un prompt che deve rispondere in JSON puro.
 function chiediAGemini(promptText) {

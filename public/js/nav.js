@@ -8,7 +8,7 @@ function chiaveGiornoOggi() {
 }
 
 function cambiaSezione(nome) {
-  ['abitudini', 'alimentazione', 'allenamento'].forEach(s => {
+  ['abitudini', 'alimentazione', 'allenamento', 'profilo'].forEach(s => {
     document.getElementById(`sec-${s}`).classList.toggle('hidden', s !== nome);
     document.getElementById(`tab-${s}`).classList.toggle('active', s === nome);
   });
