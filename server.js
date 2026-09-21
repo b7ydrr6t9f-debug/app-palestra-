@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const https = require('https');
 const path = require('path');
-const fs = require('fs');
+const { createClient } = require('@libsql/client');
 const app = express();
 
 const PORT = process.env.PORT || 10000;
@@ -11,52 +11,72 @@ const PORT = process.env.PORT || 10000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Persistenza su file JSON: funziona, ma su Render (senza Persistent Disk a
-// pagamento) il file viene azzerato a ogni riavvio/deploy del servizio.
-// Per dati che non si possono permettere di sparire, il passo successivo è
-// un database vero (es. Turso, già usato nell'altro progetto).
-const FILE_CHECKIN = path.join(__dirname, 'data-checkin.json');
+// Database: usa Turso se TURSO_DATABASE_URL è configurata, altrimenti un
+// file SQLite locale (comodo per sviluppare, ma su Render viene azzerato a
+// ogni riavvio/deploy senza un Persistent Disk a pagamento — Turso è la
+// soluzione per dati che non si possono permettere di sparire).
+const usaTurso = !!process.env.TURSO_DATABASE_URL;
+const db = createClient(
+  usaTurso
+    ? { url: process.env.TURSO_DATABASE_URL, authToken: process.env.TURSO_AUTH_TOKEN }
+    : { url: 'file:tempra-locale.sqlite' }
+);
+console.log(`[Database] Modalità: ${usaTurso ? 'Turso (persistente)' : 'file locale (non persistente su Render senza Persistent Disk)'}`);
 
-function leggiCheckin() {
+async function initDb() {
+  await db.execute(`CREATE TABLE IF NOT EXISTS checkin (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    data TEXT NOT NULL,
+    peso REAL NOT NULL,
+    vita REAL, fianchi REAL, petto REAL, braccio REAL, coscia REAL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+}
+
+app.get('/api/checkin', async (req, res) => {
   try {
-    return JSON.parse(fs.readFileSync(FILE_CHECKIN, 'utf8'));
+    const result = await db.execute('SELECT * FROM checkin ORDER BY id ASC');
+    res.json(result.rows.map(r => ({
+      id: Number(r.id), data: r.data, peso: r.peso,
+      vita: r.vita, fianchi: r.fianchi, petto: r.petto, braccio: r.braccio, coscia: r.coscia
+    })));
   } catch (e) {
-    return [];
+    console.error('[Checkin] Errore lettura:', e.message);
+    res.status(500).json({ errore: 'Errore database.' });
   }
-}
-
-function salvaCheckin(lista) {
-  fs.writeFileSync(FILE_CHECKIN, JSON.stringify(lista, null, 2));
-}
-
-app.get('/api/checkin', (req, res) => {
-  res.json(leggiCheckin());
 });
 
-app.post('/api/checkin', (req, res) => {
+app.post('/api/checkin', async (req, res) => {
   const { peso, vita, fianchi, petto, braccio, coscia } = req.body;
   if (!peso) return res.status(400).json({ errore: 'Il peso è obbligatorio.' });
 
-  const lista = leggiCheckin();
-  lista.push({
-    id: Date.now(),
-    data: new Date().toISOString().slice(0, 10),
-    peso: Number(peso),
-    vita: vita ? Number(vita) : null,
-    fianchi: fianchi ? Number(fianchi) : null,
-    petto: petto ? Number(petto) : null,
-    braccio: braccio ? Number(braccio) : null,
-    coscia: coscia ? Number(coscia) : null,
-  });
-  salvaCheckin(lista);
-  res.json({ success: true });
+  try {
+    await db.execute({
+      sql: 'INSERT INTO checkin (data, peso, vita, fianchi, petto, braccio, coscia) VALUES (?,?,?,?,?,?,?)',
+      args: [
+        new Date().toISOString().slice(0, 10),
+        Number(peso),
+        vita ? Number(vita) : null,
+        fianchi ? Number(fianchi) : null,
+        petto ? Number(petto) : null,
+        braccio ? Number(braccio) : null,
+        coscia ? Number(coscia) : null,
+      ]
+    });
+    res.json({ success: true });
+  } catch (e) {
+    console.error('[Checkin] Errore salvataggio:', e.message);
+    res.status(500).json({ errore: 'Errore database.' });
+  }
 });
 
-app.delete('/api/checkin/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const lista = leggiCheckin().filter(c => c.id !== id);
-  salvaCheckin(lista);
-  res.json({ success: true });
+app.delete('/api/checkin/:id', async (req, res) => {
+  try {
+    await db.execute({ sql: 'DELETE FROM checkin WHERE id = ?', args: [Number(req.params.id)] });
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ errore: 'Errore database.' });
+  }
 });
 
 // Chiama l'API Gemini con un prompt che deve rispondere in JSON puro.
@@ -72,7 +92,7 @@ function chiediAGemini(promptText) {
 
     const req = https.request({
       hostname: 'generativelanguage.googleapis.com',
-      path: `/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      path: `/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
     }, (res) => {
@@ -120,6 +140,11 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Server web di LiberoFlow avviato sulla porta ${PORT}`);
+initDb().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server web di Tempra avviato sulla porta ${PORT}`);
+  });
+}).catch(e => {
+  console.error('[Database] Errore inizializzazione:', e.message);
+  process.exit(1);
 });
