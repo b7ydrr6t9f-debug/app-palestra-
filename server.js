@@ -79,6 +79,29 @@ app.delete('/api/checkin/:id', async (req, res) => {
   }
 });
 
+app.put('/api/checkin/:id', async (req, res) => {
+  const { peso, vita, fianchi, petto, braccio, coscia } = req.body;
+  if (!peso) return res.status(400).json({ errore: 'Il peso è obbligatorio.' });
+  try {
+    await db.execute({
+      sql: 'UPDATE checkin SET peso=?, vita=?, fianchi=?, petto=?, braccio=?, coscia=? WHERE id=?',
+      args: [
+        Number(peso),
+        vita ? Number(vita) : null,
+        fianchi ? Number(fianchi) : null,
+        petto ? Number(petto) : null,
+        braccio ? Number(braccio) : null,
+        coscia ? Number(coscia) : null,
+        Number(req.params.id)
+      ]
+    });
+    res.json({ success: true });
+  } catch (e) {
+    console.error('[Checkin] Errore modifica:', e.message);
+    res.status(500).json({ errore: 'Errore database.' });
+  }
+});
+
 // Chiama l'API Gemini con un prompt che deve rispondere in JSON puro.
 function chiediAGemini(promptText) {
   return new Promise((resolve, reject) => {

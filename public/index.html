@@ -161,6 +161,14 @@
             </div>
 
             <div class="space-y-4" id="workout-history"></div>
+
+            <div class="card-glass p-5 rounded-2xl border border-slate-800 shadow-xl">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Progressione per esercizio</h3>
+                <select id="select-esercizio-grafico" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-rose-500 transition mb-3">
+                    <option value="">Scegli un esercizio...</option>
+                </select>
+                <svg id="esercizio-sparkline" viewBox="0 0 300 80" class="w-full h-20"></svg>
+            </div>
         </section>
 
         <!-- SEZIONE PROFILO -->
@@ -168,6 +176,10 @@
             <div id="checkin-reminder" class="hidden card-glass p-4 rounded-2xl border border-emerald-500/40 bg-emerald-950/20 text-sm text-emerald-300 flex items-center gap-2">
                 <i class="fa-solid fa-calendar-check"></i> È venerdì mattina: è il momento del tuo check-in settimanale.
             </div>
+
+            <button id="btn-attiva-notifiche" class="w-full card-glass p-3 rounded-2xl border border-slate-800 text-sm font-semibold text-slate-300 hover:border-emerald-500/50 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-bell"></i> Attiva promemoria del venerdì
+            </button>
 
             <div class="card-glass p-5 rounded-2xl border border-slate-800 shadow-xl">
                 <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-1"><i class="fa-solid fa-ruler-combined mr-2 text-emerald-500"></i>Check-in settimanale</h2>

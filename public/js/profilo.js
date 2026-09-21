@@ -1,11 +1,54 @@
 // Sezione Profilo: check-in settimanale (peso + misure), salvato lato server
-// (vedi nota su Render/persistenza nel README). Da compilare ogni venerdì
-// mattina per avere misurazioni confrontabili nel tempo.
+// (Turso). Promemoria del venerdì mattina sia come banner sia come notifica
+// di sistema reale (richiede il permesso del browser: funziona solo quando
+// l'app è aperta o in background nella stessa scheda — non è un push che
+// arriva ad app completamente chiusa, per quello servirebbe un service
+// worker + backend di invio push, infrastruttura più pesante).
+
+function eVenerdiMattina() {
+    const oggi = new Date();
+    return oggi.getDay() === 5 && oggi.getHours() < 12;
+}
 
 function mostraPromemoriaSeVenerdi() {
-    const oggi = new Date();
-    const eVenerdiMattina = oggi.getDay() === 5 && oggi.getHours() < 12;
-    document.getElementById('checkin-reminder').classList.toggle('hidden', !eVenerdiMattina);
+    document.getElementById('checkin-reminder').classList.toggle('hidden', !eVenerdiMattina());
+}
+
+function aggiornaStatoNotifiche() {
+    const btn = document.getElementById('btn-attiva-notifiche');
+    if (!('Notification' in window)) { btn.classList.add('hidden'); return; }
+    if (Notification.permission === 'granted') {
+        btn.innerHTML = '<i class="fa-solid fa-bell"></i> Promemoria attivo';
+        btn.disabled = true;
+        btn.classList.add('opacity-60', 'cursor-default');
+    } else {
+        btn.innerHTML = '<i class="fa-solid fa-bell"></i> Attiva promemoria del venerdì';
+    }
+}
+
+async function attivaNotifiche() {
+    if (!('Notification' in window)) return;
+    const esito = await Notification.requestPermission();
+    aggiornaStatoNotifiche();
+    if (esito === 'granted') {
+        localStorage.setItem('liberoflow_notifiche_attive', '1');
+        provaNotificaVenerdi();
+    }
+}
+
+// Da chiamare a ogni apertura dell'app: se è venerdì mattina, il permesso è
+// concesso e non è già stata mandata oggi, invia la notifica di sistema.
+function provaNotificaVenerdi() {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    if (!eVenerdiMattina()) return;
+    const ultimaInviata = localStorage.getItem('liberoflow_ultima_notifica_venerdi');
+    if (ultimaInviata === chiaveGiornoOggi()) return;
+
+    new Notification('Check-in settimanale', {
+        body: 'È venerdì mattina: registra peso e misure su Tempra.',
+        icon: undefined
+    });
+    localStorage.setItem('liberoflow_ultima_notifica_venerdi', chiaveGiornoOggi());
 }
 
 async function caricaCheckin() {
@@ -27,9 +70,10 @@ function disegnaSparkline(storico) {
         const y = 70 - ((p - min) / range) * 60;
         return `${x},${y}`;
     }).join(' ');
+    const ultimo = punti.split(' ').at(-1).split(',');
     svg.innerHTML = `
         <polyline points="${punti}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="${punti.split(' ').at(-1).split(',')[0]}" cy="${punti.split(' ').at(-1).split(',')[1]}" r="4" fill="#10b981"/>
+        <circle cx="${ultimo[0]}" cy="${ultimo[1]}" r="4" fill="#10b981"/>
     `;
 }
 
@@ -58,6 +102,9 @@ function renderCheckinList(storico) {
             </div>
             <div class="flex items-center gap-3 shrink-0">
                 <span class="text-sm font-bold text-emerald-300">${c.peso}kg${deltaHtml}</span>
+                <button onclick='modificaCheckin(${JSON.stringify(c)})' class="text-slate-500 hover:text-amber-400 p-1 transition">
+                    <i class="fa-solid fa-pen text-xs"></i>
+                </button>
                 <button onclick="eliminaCheckin(${c.id})" class="text-slate-500 hover:text-red-400 p-1 transition">
                     <i class="fa-solid fa-trash-can text-xs"></i>
                 </button>
@@ -74,6 +121,24 @@ async function renderProfilo() {
 
 async function eliminaCheckin(id) {
     await fetch(`/api/checkin/${id}`, { method: 'DELETE' });
+    renderProfilo();
+}
+
+async function modificaCheckin(voce) {
+    const nuovoPeso = prompt('Peso (kg):', voce.peso);
+    if (nuovoPeso === null || isNaN(Number(nuovoPeso))) return;
+
+    const campi = { peso: Number(nuovoPeso) };
+    for (const k of ['vita', 'fianchi', 'petto', 'braccio', 'coscia']) {
+        const val = prompt(`${k.charAt(0).toUpperCase() + k.slice(1)} (cm, lascia vuoto se non misurato):`, voce[k] ?? '');
+        if (val === null) continue;
+        campi[k] = val === '' ? null : Number(val);
+    }
+
+    await fetch(`/api/checkin/${voce.id}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(campi)
+    });
     renderProfilo();
 }
 
@@ -97,5 +162,9 @@ document.getElementById('checkin-form').addEventListener('submit', async (e) => 
     }
 });
 
+document.getElementById('btn-attiva-notifiche').addEventListener('click', attivaNotifiche);
+
 mostraPromemoriaSeVenerdi();
+aggiornaStatoNotifiche();
+provaNotificaVenerdi();
 renderProfilo();

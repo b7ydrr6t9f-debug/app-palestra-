@@ -1,6 +1,13 @@
 // Sezione Alimentazione: registra pasti descritti a testo libero, l'API stima
 // calorie e macro; i dati restano salvati in locale, raggruppati per giorno.
-const OBIETTIVO_CALORIE_GIORNALIERO = 2200; // solo per la barra di progresso, modificabile in futuro
+// L'obiettivo calorico giornaliero è modificabile (prima era fisso nel codice).
+
+function leggiObiettivoCalorie() {
+    return Number(localStorage.getItem('liberoflow_obiettivo_calorie')) || 2200;
+}
+function salvaObiettivoCalorie(v) {
+    localStorage.setItem('liberoflow_obiettivo_calorie', String(v));
+}
 
 function leggiPastiOggi() {
     const tutti = JSON.parse(localStorage.getItem('liberoflow_pasti') || '{}');
@@ -46,16 +53,45 @@ function eliminaPasto(id) {
     renderAlimentazione();
 }
 
+function modificaPasto(id) {
+    const pasti = leggiPastiOggi();
+    const pasto = pasti.find(p => p.id === id);
+    if (!pasto) return;
+
+    const nuoveCalorie = prompt(`Calorie per "${pasto.nome}":`, pasto.calorie);
+    if (nuoveCalorie === null || isNaN(Number(nuoveCalorie))) return;
+    pasto.calorie = Math.round(Number(nuoveCalorie));
+
+    const nuoveProteine = prompt('Proteine (g):', pasto.proteine);
+    if (nuoveProteine !== null && !isNaN(Number(nuoveProteine))) pasto.proteine = Number(nuoveProteine);
+    const nuoviCarbo = prompt('Carboidrati (g):', pasto.carboidrati);
+    if (nuoviCarbo !== null && !isNaN(Number(nuoviCarbo))) pasto.carboidrati = Number(nuoviCarbo);
+    const nuoviGrassi = prompt('Grassi (g):', pasto.grassi);
+    if (nuoviGrassi !== null && !isNaN(Number(nuoviGrassi))) pasto.grassi = Number(nuoviGrassi);
+
+    salvaPastiOggi(pasti);
+    renderAlimentazione();
+}
+
+function modificaObiettivo() {
+    const attuale = leggiObiettivoCalorie();
+    const nuovo = prompt('Nuovo obiettivo calorico giornaliero (kcal):', attuale);
+    if (nuovo === null || isNaN(Number(nuovo)) || Number(nuovo) <= 0) return;
+    salvaObiettivoCalorie(Math.round(Number(nuovo)));
+    renderAlimentazione();
+}
+
 function renderAlimentazione() {
     const pasti = leggiPastiOggi();
+    const obiettivo = leggiObiettivoCalorie();
     const totaleCalorie = pasti.reduce((s, p) => s + p.calorie, 0);
     const totaleProteine = pasti.reduce((s, p) => s + p.proteine, 0);
     const totaleCarbo = pasti.reduce((s, p) => s + p.carboidrati, 0);
     const totaleGrassi = pasti.reduce((s, p) => s + p.grassi, 0);
 
     document.getElementById('cal-totale-oggi').textContent = totaleCalorie;
-    document.getElementById('cal-obiettivo-label').textContent = `obiettivo ${OBIETTIVO_CALORIE_GIORNALIERO} kcal`;
-    document.getElementById('cal-barra').style.width = `${Math.min(100, (totaleCalorie / OBIETTIVO_CALORIE_GIORNALIERO) * 100)}%`;
+    document.getElementById('cal-obiettivo-label').innerHTML = `obiettivo ${obiettivo} kcal <button onclick="modificaObiettivo()" class="text-slate-500 hover:text-amber-400 ml-1"><i class="fa-solid fa-pen text-[10px]"></i></button>`;
+    document.getElementById('cal-barra').style.width = `${Math.min(100, (totaleCalorie / obiettivo) * 100)}%`;
     document.getElementById('cal-proteine').textContent = `${Math.round(totaleProteine)}g`;
     document.getElementById('cal-carbo').textContent = `${Math.round(totaleCarbo)}g`;
     document.getElementById('cal-grassi').textContent = `${Math.round(totaleGrassi)}g`;
@@ -73,6 +109,9 @@ function renderAlimentazione() {
             </div>
             <div class="flex items-center gap-3 shrink-0">
                 <span class="text-sm font-bold text-amber-300">${p.calorie} kcal</span>
+                <button onclick="modificaPasto(${p.id})" class="text-slate-500 hover:text-amber-400 p-1 transition">
+                    <i class="fa-solid fa-pen text-xs"></i>
+                </button>
                 <button onclick="eliminaPasto(${p.id})" class="text-slate-500 hover:text-red-400 p-1 transition">
                     <i class="fa-solid fa-trash-can text-xs"></i>
                 </button>
