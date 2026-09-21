@@ -6,6 +6,7 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "dotenv": "^18.0.1",
     "express": "^4.19.2"
   }
 }

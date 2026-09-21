@@ -3,142 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiberoFlow - Habit Tracker</title>
-    <!-- Tailwind CSS CDN -->
+    <title>LiberoFlow</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
         .card-glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .tab-btn.active { color: #fff; }
+        .tab-btn.active .tab-underline { transform: scaleX(1); }
+        .tab-underline { transform: scaleX(0); transition: transform .2s ease; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="card-glass border-b border-slate-800 sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-            <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
-                <i class="fa-solid fa-bolt text-white text-xl"></i>
-            </div>
-            <div>
-                <h1 class="text-xl font-extrabold tracking-tight text-white">LiberoFlow</h1>
-                <p class="text-xs text-slate-400">Traccia le tue abitudini quotidiane</p>
+    <header class="card-glass border-b border-slate-800 sticky top-0 z-50 px-6 pt-4 flex flex-col">
+        <div class="flex justify-between items-center pb-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-bolt text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight text-white">LiberoFlow</h1>
+                    <p class="text-xs text-slate-400" id="current-date"></p>
+                </div>
             </div>
         </div>
-        <div id="current-date" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-800 text-indigo-400 border border-slate-700"></div>
+        <!-- Tab navigation -->
+        <nav class="flex gap-6 -mb-px text-sm font-semibold text-slate-500">
+            <button onclick="cambiaSezione('abitudini')" id="tab-abitudini" class="tab-btn active pb-3 flex items-center gap-2 transition relative">
+                <i class="fa-solid fa-list-check"></i> Abitudini
+                <span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-indigo-500 rounded-full"></span>
+            </button>
+            <button onclick="cambiaSezione('alimentazione')" id="tab-alimentazione" class="tab-btn pb-3 flex items-center gap-2 transition relative">
+                <i class="fa-solid fa-utensils"></i> Alimentazione
+                <span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-amber-500 rounded-full"></span>
+            </button>
+            <button onclick="cambiaSezione('allenamento')" id="tab-allenamento" class="tab-btn pb-3 flex items-center gap-2 transition relative">
+                <i class="fa-solid fa-dumbbell"></i> Allenamento
+                <span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-rose-500 rounded-full"></span>
+            </button>
+        </nav>
     </header>
 
     <!-- Main Content -->
     <main class="flex-1 max-w-3xl w-full mx-auto p-6 space-y-6">
-        
-        <!-- Statistiche rapide -->
-        <div class="grid grid-cols-2 gap-4">
-            <div class="card-glass p-4 rounded-2xl border border-slate-800">
-                <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Completate Oggi</div>
-                <div id="completed-count" class="text-3xl font-extrabold text-white mt-1">0 / 0</div>
-            </div>
-            <div class="card-glass p-4 rounded-2xl border border-slate-800">
-                <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Streak Globale</div>
-                <div id="streak-count" class="text-3xl font-extrabold text-indigo-400 mt-1">🔥 0 giorni</div>
-            </div>
-        </div>
 
-        <!-- Sezione Aggiungi Abitudine -->
-        <div class="card-glass p-5 rounded-2xl border border-slate-800 shadow-xl">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-3"><i class="fa-solid fa-plus-circle mr-2 text-indigo-500"></i>Nuova Abitudine</h2>
-            <form id="habit-form" class="flex gap-3">
-                <input type="text" id="habit-input" placeholder="Es. Studiare medicina, Allenamento..." required
-                    class="flex-1 bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
-                <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/30 transition">
-                    Aggiungi
-                </button>
-            </form>
-        </div>
-
-        <!-- Lista Abitudini -->
-        <div class="space-y-3">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 px-1">Le tue abitudini</h2>
-            <div id="habits-list" class="space-y-3">
-                <!-- Verranno inserite dinamicamente -->
+        <!-- SEZIONE ABITUDINI -->
+        <section id="sec-abitudini" class="space-y-6">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="card-glass p-4 rounded-2xl border border-slate-800">
+                    <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Completate Oggi</div>
+                    <div id="completed-count" class="text-3xl font-extrabold text-white mt-1">0 / 0</div>
+                </div>
+                <div class="card-glass p-4 rounded-2xl border border-slate-800">
+                    <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Streak Globale</div>
+                    <div id="streak-count" class="text-3xl font-extrabold text-indigo-400 mt-1">🔥 0 giorni</div>
+                </div>
             </div>
-        </div>
+
+            <div class="card-glass p-5 rounded-2xl border border-slate-800 shadow-xl">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-3"><i class="fa-solid fa-plus-circle mr-2 text-indigo-500"></i>Nuova Abitudine</h2>
+                <form id="habit-form" class="flex gap-3">
+                    <input type="text" id="habit-input" placeholder="Es. Studiare medicina, Allenamento..." required
+                        class="flex-1 bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/30 transition">
+                        Aggiungi
+                    </button>
+                </form>
+            </div>
+
+            <div class="space-y-3">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 px-1">Le tue abitudini</h2>
+                <div id="habits-list" class="space-y-3"></div>
+            </div>
+        </section>
+
+        <!-- SEZIONE ALIMENTAZIONE -->
+        <section id="sec-alimentazione" class="hidden space-y-6">
+            <div class="card-glass p-5 rounded-2xl border border-slate-800 shadow-xl">
+                <div class="flex justify-between items-baseline mb-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Totale di oggi</span>
+                    <span class="text-xs text-slate-500" id="cal-obiettivo-label"></span>
+                </div>
+                <div class="flex items-end gap-2 mb-3">
+                    <span id="cal-totale-oggi" class="text-4xl font-extrabold text-white">0</span>
+                    <span class="text-slate-400 text-sm mb-1">kcal</span>
+                </div>
+                <div class="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+                    <div id="cal-barra" class="h-full bg-amber-500 rounded-full transition-all" style="width:0%"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-3 mt-4 text-center">
+                    <div>
+                        <div class="text-lg font-bold text-amber-300" id="cal-proteine">0g</div>
+                        <div class="text-[11px] text-slate-500 uppercase tracking-wide">Proteine</div>
+                    </div>
+                    <div>
+                        <div class="text-lg font-bold text-amber-300" id="cal-carbo">0g</div>
+                        <div class="text-[11px] text-slate-500 uppercase tracking-wide">Carboidrati</div>
+                    </div>
+                    <div>
+                        <div class="text-lg font-bold text-amber-300" id="cal-grassi">0g</div>
+                        <div class="text-[11px] text-slate-500 uppercase tracking-wide">Grassi</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-glass p-5 rounded-2xl border border-slate-800 shadow-xl">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-3"><i class="fa-solid fa-wand-magic-sparkles mr-2 text-amber-500"></i>Cosa hai mangiato?</h2>
+                <form id="food-form" class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="food-input" placeholder="Es. 150g di petto di pollo e riso" required
+                        class="flex-1 bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
+                    <button type="submit" id="food-submit-btn" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-amber-600/20 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass"></i> Stima
+                    </button>
+                </form>
+                <p id="food-errore" class="hidden text-rose-400 text-xs mt-2"></p>
+            </div>
+
+            <div class="space-y-3">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 px-1">Oggi hai mangiato</h2>
+                <div id="food-list" class="space-y-2"></div>
+            </div>
+        </section>
+
+        <!-- SEZIONE ALLENAMENTO -->
+        <section id="sec-allenamento" class="hidden space-y-6">
+            <div class="card-glass p-5 rounded-2xl border border-slate-800 shadow-xl">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-3"><i class="fa-solid fa-dumbbell mr-2 text-rose-500"></i>Registra un esercizio</h2>
+                <form id="workout-form" class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <input type="text" id="w-esercizio" placeholder="Esercizio" required
+                        class="col-span-2 sm:col-span-2 bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 transition">
+                    <input type="number" id="w-serie" placeholder="Serie" min="1" required
+                        class="bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 transition">
+                    <input type="number" id="w-ripetizioni" placeholder="Rip." min="1" required
+                        class="bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 transition">
+                    <input type="number" id="w-peso" placeholder="Kg" min="0" step="0.5"
+                        class="bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 transition">
+                    <button type="submit" class="col-span-2 sm:col-span-5 bg-rose-600 hover:bg-rose-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-rose-600/20 transition">
+                        Aggiungi alla sessione di oggi
+                    </button>
+                </form>
+            </div>
+
+            <div class="space-y-4" id="workout-history"></div>
+        </section>
 
     </main>
 
-    <!-- Script di gestione -->
-    <script>
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('current-date').innerText = new Date().toLocaleDateString('it-IT', options);
-
-        let habits = JSON.parse(localStorage.getItem('liberoflow_habits')) || [
-            { id: 1, name: 'Studio Semestre Filtro (Biologia/Chimica)', completed: false },
-            { id: 2, name: 'Sessione di programmazione', completed: false }
-        ];
-
-        function saveData() {
-            localStorage.setItem('liberoflow_habits', JSON.stringify(habits));
-            renderHabits();
-        }
-
-        function toggleHabit(id) {
-            habits = habits.map(h => h.id === id ? { ...h, completed: !h.completed } : h);
-            saveData();
-        }
-
-        function deleteHabit(id) {
-            habits = habits.filter(h => h.id !== id);
-            saveData();
-        }
-
-        function renderHabits() {
-            const listEl = document.getElementById('habits-list');
-            listEl.innerHTML = '';
-            
-            if (habits.length === 0) {
-                listEl.innerHTML = `<div class="text-center py-10 text-slate-500 text-sm">Nessuna abitudine inserita. Aggiungine una qui sopra!</div>`;
-                document.getElementById('completed-count').innerText = `0 / 0`;
-                return;
-            }
-
-            let completed = 0;
-            habits.forEach(habit => {
-                if (habit.completed) completed++;
-                const div = document.createElement('div');
-                div.className = `card-glass p-4 rounded-2xl flex items-center justify-between border transition ${habit.completed ? 'border-emerald-500/40 bg-emerald-950/10' : 'border-slate-800'}`;
-                div.innerHTML = `
-                    <div class="flex items-center space-x-4 cursor-pointer flex-1" onclick="toggleHabit(${habit.id})">
-                        <div class="w-7 h-7 rounded-lg border-2 flex items-center justify-center transition ${habit.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-600 bg-slate-900'}">
-                            ${habit.completed ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
-                        </div>
-                        <span class="text-sm font-medium ${habit.completed ? 'line-through text-slate-400' : 'text-white'}">${habit.name}</span>
-                    </div>
-                    <button onclick="deleteHabit(${habit.id})" class="text-slate-500 hover:text-red-400 p-2 transition">
-                        <i class="fa-solid fa-trash-can text-sm"></i>
-                    </button>
-                `;
-                listEl.appendChild(div);
-            });
-
-            document.getElementById('completed-count').innerText = `${completed} / ${habits.length}`;
-        }
-
-        document.getElementById('habit-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const input = document.getElementById('habit-input');
-            if (input.value.trim() === '') return;
-            
-            habits.push({
-                id: Date.now(),
-                name: input.value.trim(),
-                completed: false
-            });
-            
-            input.value = '';
-            saveData();
-        });
-
-        renderHabits();
-    </script>
+    <script src="js/nav.js"></script>
+    <script src="js/abitudini.js"></script>
+    <script src="js/alimentazione.js"></script>
+    <script src="js/allenamento.js"></script>
 </body>
 </html>
