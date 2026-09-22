@@ -1,6 +1,34 @@
-// Sezione Alimentazione: registra pasti descritti a testo libero, l'API stima
-// calorie e macro; i dati restano salvati in locale, raggruppati per giorno.
-// L'obiettivo calorico giornaliero è modificabile (prima era fisso nel codice).
+// Sezione Alimentazione: registra pasti (via stima AI o inserimento manuale),
+// i dati restano salvati in locale, raggruppati per giorno. L'obiettivo
+// calorico giornaliero è modificabile (prima era fisso nel codice).
+
+let modoInserimento = 'ai'; // 'ai' | 'manuale'
+let baseManuale = '100g'; // '100g' | 'porzione'
+
+function impostaModoInserimento(modo) {
+    modoInserimento = modo;
+    document.getElementById('food-modo-ai').className = modo === 'ai'
+        ? 'py-2 rounded-lg transition bg-amber-500 text-slate-950'
+        : 'py-2 rounded-lg transition text-slate-400';
+    document.getElementById('food-modo-manuale').className = modo === 'manuale'
+        ? 'py-2 rounded-lg transition bg-amber-500 text-slate-950'
+        : 'py-2 rounded-lg transition text-slate-400';
+    document.getElementById('food-label-etichetta').classList.toggle('hidden', modo !== 'ai');
+    document.getElementById('food-blocco-manuale').classList.toggle('hidden', modo !== 'manuale');
+}
+
+function impostaBaseManuale(base) {
+    baseManuale = base;
+    document.getElementById('food-base-100g').className = base === '100g'
+        ? 'py-2 rounded-lg transition bg-amber-500 text-slate-950'
+        : 'py-2 rounded-lg transition text-slate-400';
+    document.getElementById('food-base-porzione').className = base === 'porzione'
+        ? 'py-2 rounded-lg transition bg-amber-500 text-slate-950'
+        : 'py-2 rounded-lg transition text-slate-400';
+    document.getElementById('food-base-hint').textContent = base === '100g'
+        ? "I valori inseriti sono ogni 100g: verranno moltiplicati per il peso indicato sopra."
+        : "I valori inseriti sono per l'intera porzione che stai mangiando (il peso sopra è solo indicativo, non viene usato per il calcolo).";
+}
 
 function leggiObiettivoCalorie() {
     return Number(localStorage.getItem('liberoflow_obiettivo_calorie')) || 2200;
@@ -26,6 +54,21 @@ function mostraErroreCibo(msg) {
     el.classList.remove('hidden');
 }
 
+function aggiungiPastoAllElenco(nome, calorie, proteine, carboidrati, grassi) {
+    const pasti = leggiPastiOggi();
+    pasti.push({
+        id: Date.now(),
+        nome,
+        calorie: Math.round(calorie),
+        proteine: proteine || 0,
+        carboidrati: carboidrati || 0,
+        grassi: grassi || 0,
+        ora: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
+    });
+    salvaPastiOggi(pasti);
+    renderAlimentazione();
+}
+
 async function stimaEAggiungiPasto(alimento, peso, immagineBase64) {
     const res = await fetch('/api/stima-calorie', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -33,19 +76,20 @@ async function stimaEAggiungiPasto(alimento, peso, immagineBase64) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.dettaglio || data.errore || 'Stima non riuscita.');
+    aggiungiPastoAllElenco(data.nome || alimento, data.calorie, data.proteine_g, data.carboidrati_g, data.grassi_g);
+}
 
-    const pasti = leggiPastiOggi();
-    pasti.push({
-        id: Date.now(),
-        nome: data.nome || alimento,
-        calorie: Math.round(data.calorie),
-        proteine: data.proteine_g || 0,
-        carboidrati: data.carboidrati_g || 0,
-        grassi: data.grassi_g || 0,
-        ora: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
-    });
-    salvaPastiOggi(pasti);
-    renderAlimentazione();
+// Inserimento manuale: se i valori sono "per 100g" li scala in base al peso,
+// se sono "per porzione" li usa così come sono (il peso è solo indicativo).
+function aggiungiPastoManuale(alimento, peso, calorie, proteine, carboidrati, grassi) {
+    const fattore = baseManuale === '100g' ? (Number(peso) / 100) : 1;
+    aggiungiPastoAllElenco(
+        alimento,
+        calorie * fattore,
+        proteine * fattore,
+        carboidrati * fattore,
+        grassi * fattore
+    );
 }
 
 // Converte il file immagine scelto in una data URL base64 da mandare al server
@@ -154,6 +198,23 @@ document.getElementById('food-form').addEventListener('submit', async (e) => {
     if (!alimento || !peso) return;
 
     document.getElementById('food-errore').classList.add('hidden');
+
+    if (modoInserimento === 'manuale') {
+        const calorie = document.getElementById('food-man-calorie').value;
+        if (!calorie) return mostraErroreCibo('Inserisci almeno le calorie.');
+        aggiungiPastoManuale(
+            alimento, peso,
+            Number(calorie),
+            Number(document.getElementById('food-man-proteine').value || 0),
+            Number(document.getElementById('food-man-carbo').value || 0),
+            Number(document.getElementById('food-man-grassi').value || 0)
+        );
+        e.target.reset();
+        impostaModoInserimento('manuale'); // il reset del form pulisce anche i bottoni: li reimposto
+        impostaBaseManuale(baseManuale);
+        return;
+    }
+
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Aggiunta in corso...';
 
@@ -175,4 +236,6 @@ document.getElementById('food-form').addEventListener('submit', async (e) => {
     }
 });
 
+impostaModoInserimento('ai');
+impostaBaseManuale('100g');
 renderAlimentazione();
