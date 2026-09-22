@@ -102,10 +102,9 @@ app.put('/api/checkin/:id', async (req, res) => {
   }
 });
 
-// Chiama l'API Gemini con un prompt (e opzionalmente un'immagine) che deve
-// rispondere in JSON puro. Logga sempre il corpo grezzo della risposta in
-// caso di errore, per non dover più indovinare la causa a occhio.
-function chiediAGemini(promptText, immagine) {
+// Singolo tentativo di chiamata a Gemini. Logga sempre il corpo grezzo della
+// risposta in caso di errore, per non dover più indovinare la causa a occhio.
+function chiediAGeminiUnaVolta(promptText, immagine) {
   return new Promise((resolve, reject) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return reject(new Error('GEMINI_API_KEY non configurata sul server.'));
@@ -129,11 +128,11 @@ function chiediAGemini(promptText, immagine) {
       res.on('end', () => {
         if (res.statusCode !== 200) {
           console.error(`[Gemini] HTTP ${res.statusCode}:`, data);
-          try {
-            return reject(new Error(JSON.parse(data)?.error?.message || `Gemini ha risposto con errore ${res.statusCode}.`));
-          } catch (e) {
-            return reject(new Error(`Gemini ha risposto con errore ${res.statusCode}.`));
-          }
+          let msg = `Gemini ha risposto con errore ${res.statusCode}.`;
+          try { msg = JSON.parse(data)?.error?.message || msg; } catch (e) {}
+          const err = new Error(msg);
+          err.statusCode = res.statusCode;
+          return reject(err);
         }
         try {
           const parsed = JSON.parse(data);
@@ -153,6 +152,24 @@ function chiediAGemini(promptText, immagine) {
     req.write(body);
     req.end();
   });
+}
+
+const attesa = (ms) => new Promise(r => setTimeout(r, ms));
+
+// Riprova automaticamente in caso di sovraccarico temporaneo dei server
+// Gemini (503) o rate limit (429), con una breve pausa crescente tra i
+// tentativi — sono errori transitori, quasi sempre risolti al secondo giro.
+async function chiediAGemini(promptText, immagine, tentativi = 3) {
+  for (let i = 1; i <= tentativi; i++) {
+    try {
+      return await chiediAGeminiUnaVolta(promptText, immagine);
+    } catch (e) {
+      const riprovabile = e.statusCode === 503 || e.statusCode === 429;
+      if (!riprovabile || i === tentativi) throw e;
+      console.log(`[Gemini] Tentativo ${i} fallito (${e.statusCode}), riprovo tra ${i * 800}ms...`);
+      await attesa(i * 800);
+    }
+  }
 }
 
 // Stima calorie e macronutrienti a partire da alimento + peso, con foto
