@@ -135,6 +135,41 @@ function modificaObiettivo() {
     renderAlimentazione();
 }
 
+// Somma le calorie mangiate in un giorno specifico (chiave YYYY-MM-DD)
+function calorieMangiateIlGiorno(chiave) {
+    const tutti = JSON.parse(localStorage.getItem('liberoflow_pasti') || '{}');
+    return (tutti[chiave] || []).reduce((s, p) => s + p.calorie, 0);
+}
+
+function formattaDeficit(valore) {
+    // deficit positivo = si è mangiato meno del dispendio (buono per dimagrire)
+    const segno = valore >= 0 ? '-' : '+';
+    return `${segno}${Math.abs(Math.round(valore))}`;
+}
+
+function renderDeficit() {
+    const dispendio = leggiDispendioEnergetico();
+    const oggi = chiaveGiornoOggi();
+    const mangiateOggi = calorieMangiateIlGiorno(oggi);
+    const deficitOggi = dispendio - mangiateOggi;
+
+    let deficitSettimana = 0;
+    for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const chiave = d.toISOString().slice(0, 10);
+        deficitSettimana += dispendio - calorieMangiateIlGiorno(chiave);
+    }
+
+    const elOggi = document.getElementById('deficit-oggi');
+    const elSettimana = document.getElementById('deficit-settimana');
+    elOggi.textContent = `${formattaDeficit(deficitOggi)} kcal`;
+    elOggi.className = `text-2xl font-extrabold ${deficitOggi >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+    elSettimana.textContent = `${formattaDeficit(deficitSettimana)} kcal`;
+    elSettimana.className = `text-2xl font-extrabold ${deficitSettimana >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+    document.getElementById('deficit-dispendio-label').textContent = `dispendio ${dispendio} kcal/giorno`;
+}
+
 function renderAlimentazione() {
     const pasti = leggiPastiOggi();
     const obiettivo = leggiObiettivoCalorie();
@@ -149,6 +184,7 @@ function renderAlimentazione() {
     document.getElementById('cal-proteine').textContent = `${Math.round(totaleProteine)}g`;
     document.getElementById('cal-carbo').textContent = `${Math.round(totaleCarbo)}g`;
     document.getElementById('cal-grassi').textContent = `${Math.round(totaleGrassi)}g`;
+    renderDeficit();
 
     const listEl = document.getElementById('food-list');
     if (pasti.length === 0) {

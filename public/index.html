@@ -124,6 +124,24 @@
             </div>
 
             <div class="card-glass p-5 rounded-2xl border border-slate-800 shadow-xl">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Deficit calorico</h3>
+                    <span class="text-xs text-slate-500" id="deficit-dispendio-label"></span>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                        <div class="text-2xl font-extrabold" id="deficit-oggi">-</div>
+                        <div class="text-[11px] text-slate-500 uppercase tracking-wide">Oggi</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-extrabold" id="deficit-settimana">-</div>
+                        <div class="text-[11px] text-slate-500 uppercase tracking-wide">Ultimi 7 giorni</div>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-3 text-center">Verde = deficit (mangiato meno del dispendio) · Rosso = surplus</p>
+            </div>
+
+            <div class="card-glass p-5 rounded-2xl border border-slate-800 shadow-xl">
                 <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-3"><i class="fa-solid fa-wand-magic-sparkles mr-2 text-amber-500"></i>Aggiungi alimento</h2>
 
                 <div class="grid grid-cols-2 gap-1 bg-slate-900/60 p-1 rounded-xl mb-4 text-xs font-semibold">
@@ -194,8 +212,13 @@
                         class="bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 transition">
                     <input type="number" id="w-peso" placeholder="Kg" min="0" step="0.5"
                         class="bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 transition">
+                    <div class="col-span-2 sm:col-span-5">
+                        <label class="block text-[11px] text-slate-500 uppercase tracking-wide mb-1">Data (se dimentichi di registrare, puoi scegliere un giorno passato)</label>
+                        <input type="date" id="w-data"
+                            class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-rose-500 transition">
+                    </div>
                     <button type="submit" class="col-span-2 sm:col-span-5 bg-rose-600 hover:bg-rose-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-rose-600/20 transition">
-                        Aggiungi alla sessione di oggi
+                        Aggiungi alla sessione
                     </button>
                 </form>
             </div>
@@ -213,6 +236,17 @@
 
         <!-- SEZIONE PROFILO -->
         <section id="sec-profilo" class="hidden space-y-6">
+            <div class="card-glass p-5 rounded-2xl border border-slate-800 shadow-xl">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-1"><i class="fa-solid fa-fire mr-2 text-emerald-500"></i>Dispendio energetico giornaliero</h2>
+                <p class="text-xs text-slate-500 mb-3">Le calorie che il tuo corpo consuma in un giorno medio (mantenimento). Usato per calcolare il deficit/surplus in Alimentazione.</p>
+                <div class="flex items-center gap-3">
+                    <span id="dispendio-valore" class="text-2xl font-extrabold text-white">2200 kcal</span>
+                    <button onclick="modificaDispendio()" class="text-slate-500 hover:text-emerald-400 p-1 transition">
+                        <i class="fa-solid fa-pen text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
             <div id="checkin-reminder" class="hidden card-glass p-4 rounded-2xl border border-emerald-500/40 bg-emerald-950/20 text-sm text-emerald-300 flex items-center gap-2">
                 <i class="fa-solid fa-calendar-check"></i> È venerdì mattina: è il momento del tuo check-in settimanale.
             </div>

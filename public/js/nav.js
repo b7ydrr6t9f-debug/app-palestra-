@@ -7,6 +7,16 @@ function chiaveGiornoOggi() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 }
 
+// Dispendio energetico giornaliero (TDEE), impostato in Profilo ma usato
+// anche da Alimentazione per il calcolo del deficit: sta qui perché nav.js
+// è il primo file caricato, quindi la funzione esiste già quando serve.
+function leggiDispendioEnergetico() {
+  return Number(localStorage.getItem('liberoflow_dispendio_energetico')) || 2200;
+}
+function salvaDispendioEnergetico(v) {
+  localStorage.setItem('liberoflow_dispendio_energetico', String(v));
+}
+
 function cambiaSezione(nome) {
   ['abitudini', 'alimentazione', 'allenamento', 'profilo'].forEach(s => {
     document.getElementById(`sec-${s}`).classList.toggle('hidden', s !== nome);

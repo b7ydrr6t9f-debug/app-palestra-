@@ -10,6 +10,15 @@ function eVenerdiMattina() {
     return oggi.getDay() === 5 && oggi.getHours() < 12;
 }
 
+function modificaDispendio() {
+    const attuale = leggiDispendioEnergetico();
+    const nuovo = prompt('Il tuo dispendio energetico giornaliero (TDEE), in kcal:', attuale);
+    if (nuovo === null || isNaN(Number(nuovo)) || Number(nuovo) <= 0) return;
+    salvaDispendioEnergetico(Math.round(Number(nuovo)));
+    document.getElementById('dispendio-valore').textContent = `${leggiDispendioEnergetico()} kcal`;
+    if (typeof renderAlimentazione === 'function') renderAlimentazione();
+}
+
 function mostraPromemoriaSeVenerdi() {
     document.getElementById('checkin-reminder').classList.toggle('hidden', !eVenerdiMattina());
 }
@@ -167,4 +176,5 @@ document.getElementById('btn-attiva-notifiche').addEventListener('click', attiva
 mostraPromemoriaSeVenerdi();
 aggiornaStatoNotifiche();
 provaNotificaVenerdi();
+document.getElementById('dispendio-valore').textContent = `${leggiDispendioEnergetico()} kcal`;
 renderProfilo();
