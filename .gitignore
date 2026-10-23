@@ -1,4 +1,9 @@
 node_modules/
 .env
+.env.*
+!.env.example
+*.log
+npm-debug.log*
 *.sqlite
-data-checkin.json
+*.sqlite-*
+.DS_Store
