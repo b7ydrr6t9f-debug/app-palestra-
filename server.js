@@ -19,7 +19,6 @@ const db = createClient(
 );
 
 async function initDb() {
-  await db.execute('PRAGMA foreign_keys = ON');
   await db.execute(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL,
@@ -150,6 +149,8 @@ app.patch('/api/auth/password', requireAuth, async (req, res, next) => {
 app.delete('/api/auth/account', requireAuth, async (req, res, next) => {
   try {
     if (!verifyPassword(String(req.body.password || ''), req.user.password_hash)) return res.status(401).json({ error: 'Password non corretta.' });
+    await db.execute({ sql: 'DELETE FROM workouts WHERE user_id = ?', args: [req.user.id] });
+    await db.execute({ sql: 'DELETE FROM checkin WHERE user_id = ?', args: [req.user.id] });
     await db.execute({ sql: 'DELETE FROM users WHERE id = ?', args: [req.user.id] });
     clearSession(res);
     res.json({ success: true });
@@ -222,4 +223,4 @@ app.use((error, req, res, next) => {
   res.status(error.statusCode || 500).json({ error: error.statusCode ? error.message : 'Errore interno del server.' });
 });
 
-initDb().then(() => app.listen(PORT, () => console.log(`Tempra Gym avviata sulla porta ${PORT}`))).catch((error) => { console.error(error.message); process.exit(1); });
+initDb().then(() => app.listen(PORT, () => console.log(`Tempra Gym avviata sulla porta ${PORT}`))).catch((error) => { console.error('Errore database:', error.message); process.exit(1); });
