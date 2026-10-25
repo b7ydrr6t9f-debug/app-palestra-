@@ -19,7 +19,7 @@ h1,h2,h3,.display{font-family:Sora,sans-serif;letter-spacing:-.02em}
 .kicker{font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#7c8896}
 .lime{color:#bef264}.lime-glow{text-shadow:0 0 22px rgba(190,242,100,.45)}
 .gradient-lime{background:linear-gradient(90deg,#bef264,#a3e635,#4ade80);-webkit-background-clip:text;background-clip:text;color:transparent}
-.tab-btn{position:relative;color:#6b7684;transition:color .2s}.tab-btn.active{color:#fff}
+.tab-btn{position:relative;z-index:10;color:#6b7684;transition:color .2s;cursor:pointer}.tab-btn.active{color:#fff}
 .tab-underline{transform:scaleX(0);transition:transform .28s cubic-bezier(.2,.8,.2,1)}.tab-btn.active .tab-underline{transform:scaleX(1)}
 .section{animation:sectionIn .42s cubic-bezier(.2,.8,.2,1)}
 @keyframes sectionIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -38,7 +38,6 @@ h1,h2,h3,.display{font-family:Sora,sans-serif;letter-spacing:-.02em}
 </head>
 <body class="min-h-screen flex flex-col">
 <div class="bg-sport"></div><div class="bg-lines"></div>
-
 <div id="auth-screen" class="fixed inset-0 z-50 grid place-items-center px-5">
 <div class="card w-full max-w-md p-7">
 <div class="flex items-center gap-3 mb-6"><div class="w-11 h-11 rounded-2xl bg-white/5 border border-lime-300/20 grid place-items-center"><i class="fa-solid fa-bolt lime text-lg lime-glow"></i></div><div><h1 class="text-xl font-extrabold text-white">TEM<span class="gradient-lime">PRA</span> GYM</h1><p class="text-xs text-slate-400">Allenati, misura, progredisci.</p></div></div>
@@ -52,18 +51,17 @@ h1,h2,h3,.display{font-family:Sora,sans-serif;letter-spacing:-.02em}
 </form>
 </div>
 </div>
-
 <div id="app" class="hidden min-h-screen flex flex-col">
 <header class="sticky top-0 z-40 border-b border-white/5 bg-[#05070a]/85 backdrop-blur-xl px-5 sm:px-8 pt-4">
 <div class="max-w-6xl mx-auto flex items-center justify-between gap-4 pb-4">
 <div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl bg-white/5 border border-lime-300/20 grid place-items-center"><i class="fa-solid fa-bolt lime lime-glow"></i></div><div><h1 class="text-xl font-extrabold text-white">TEM<span class="gradient-lime">PRA</span></h1><p class="text-[11px] text-slate-400">La tua palestra, i tuoi progressi</p></div></div>
 <div class="flex items-center gap-3"><div class="hidden sm:flex items-center gap-2 pill px-3 py-2 rounded-full text-[11px] font-bold text-lime-200"><span class="live-dot"></span> Account attivo</div><button id="logout-btn" class="btn text-slate-400 hover:text-rose-300 p-2 rounded-xl hover:bg-white/5" title="Esci"><i class="fa-solid fa-right-from-bracket"></i></button></div>
 </div>
-<nav class="max-w-6xl mx-auto flex gap-4 sm:gap-7 -mb-px text-sm font-bold overflow-x-auto">
-<button data-section="dashboard" class="tab-btn active pb-3 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-chart-line lime"></i> Dashboard<span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-lime-300 rounded-full"></span></button>
-<button data-section="allenamento" class="tab-btn pb-3 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-dumbbell lime"></i> Allenamento<span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-lime-300 rounded-full"></span></button>
-<button data-section="progressi" class="tab-btn pb-3 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-arrow-trend-up lime"></i> Progressi<span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-lime-300 rounded-full"></span></button>
-<button data-section="profilo" class="tab-btn pb-3 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-user lime"></i> Profilo<span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-lime-300 rounded-full"></span></button>
+<nav class="max-w-6xl mx-auto relative z-20 flex gap-2 sm:gap-6 -mb-px text-sm font-bold overflow-x-auto pb-1">
+<button type="button" onclick="vaiASezione('dashboard')" data-section="dashboard" class="tab-btn active px-3 py-3 flex items-center gap-2 whitespace-nowrap rounded-t-xl"><i class="fa-solid fa-chart-line lime"></i> Dashboard<span class="tab-underline absolute left-3 right-3 bottom-0 h-0.5 bg-lime-300 rounded-full"></span></button>
+<button type="button" onclick="vaiASezione('allenamento')" data-section="allenamento" class="tab-btn px-3 py-3 flex items-center gap-2 whitespace-nowrap rounded-t-xl"><i class="fa-solid fa-dumbbell lime"></i> Allenamento<span class="tab-underline absolute left-3 right-3 bottom-0 h-0.5 bg-lime-300 rounded-full"></span></button>
+<button type="button" onclick="vaiASezione('progressi')" data-section="progressi" class="tab-btn px-3 py-3 flex items-center gap-2 whitespace-nowrap rounded-t-xl"><i class="fa-solid fa-arrow-trend-up lime"></i> Progressi<span class="tab-underline absolute left-3 right-3 bottom-0 h-0.5 bg-lime-300 rounded-full"></span></button>
+<button type="button" onclick="vaiASezione('profilo')" data-section="profilo" class="tab-btn px-3 py-3 flex items-center gap-2 whitespace-nowrap rounded-t-xl"><i class="fa-solid fa-user lime"></i> Profilo<span class="tab-underline absolute left-3 right-3 bottom-0 h-0.5 bg-lime-300 rounded-full"></span></button>
 </nav>
 </header>
 <main class="flex-1 max-w-6xl w-full mx-auto px-5 sm:px-8 py-7 space-y-7">
@@ -87,11 +85,7 @@ h1,h2,h3,.display{font-family:Sora,sans-serif;letter-spacing:-.02em}
 </section>
 <section id="sec-profilo" class="hidden space-y-6">
 <div class="card reveal p-6"><div class="flex items-center gap-4"><div class="w-16 h-16 rounded-3xl bg-lime-300/10 border border-lime-300/25 grid place-items-center"><i class="fa-solid fa-user lime text-xl"></i></div><div><h2 id="profile-name" class="display text-2xl font-extrabold text-white">—</h2><p id="profile-email" class="text-sm text-slate-400">—</p></div></div></div>
-<div class="grid sm:grid-cols-3 gap-4">
-<div class="card reveal p-5"><div class="kicker">Membro dal</div><div id="profile-since" class="display text-lg font-bold text-white mt-2">—</div></div>
-<div class="card reveal p-5"><div class="kicker">Obiettivo</div><div id="profile-goal" class="display text-lg font-bold text-lime-300 mt-1">—</div></div>
-<div class="card reveal p-5"><div class="kicker">Dispendio</div><div id="profile-tdee" class="display text-lg font-bold text-white mt-1">—</div></div>
-</div>
+<div class="grid sm:grid-cols-3 gap-4"><div class="card reveal p-5"><div class="kicker">Membro dal</div><div id="profile-since" class="display text-lg font-bold text-white mt-2">—</div></div><div class="card reveal p-5"><div class="kicker">Obiettivo</div><div id="profile-goal" class="display text-lg font-bold text-lime-300 mt-1">—</div></div><div class="card reveal p-5"><div class="kicker">Dispendio</div><div id="profile-tdee" class="display text-lg font-bold text-white mt-1">—</div></div></div>
 <div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Modifica profilo</h2><form id="profile-form" class="grid sm:grid-cols-3 gap-3"><div><label class="kicker block mb-1">Nome</label><input id="p-nome" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><div><label class="kicker block mb-1">Obiettivo</label><select id="p-obiettivo" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"><option>Ipertrofia</option><option>Forza</option><option>Dimagrimento</option><option>Mantenimento</option></select></div><div><label class="kicker block mb-1">Dispendio kcal</label><input id="p-dispendio" type="number" min="1" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><button class="btn btn-lime sm:col-span-3 px-6 py-3 rounded-2xl font-extrabold text-sm">Salva profilo</button></form></div>
 </section>
 </main>

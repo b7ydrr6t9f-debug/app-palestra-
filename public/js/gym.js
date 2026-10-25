@@ -3,6 +3,11 @@
 let workouts = [];
 let checkins = [];
 
+function vaiASezione(nome) {
+  document.querySelectorAll('[data-section]').forEach((button) => button.classList.toggle('active', button.dataset.section === nome));
+  ['dashboard', 'allenamento', 'progressi', 'profilo'].forEach((section) => document.getElementById(`sec-${section}`).classList.toggle('hidden', section !== nome));
+}
+
 function formatDate(value) {
   return new Date(`${value}T00:00:00`).toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' });
 }
@@ -27,8 +32,7 @@ function renderDashboard() {
   document.getElementById('stat-exercises').textContent = exercises.size;
   document.getElementById('stat-last').textContent = workouts[0] ? formatDate(workouts[0].data) : '—';
 
-  const recent = document.getElementById('recent-workouts');
-  recent.innerHTML = workouts.slice(0, 5).map((item) => `
+  document.getElementById('recent-workouts').innerHTML = workouts.slice(0, 5).map((item) => `
     <div class="flex items-center justify-between rounded-2xl bg-white/[.03] border border-white/5 px-4 py-3">
       <div><div class="text-sm font-bold text-white">${item.esercizio}</div><div class="text-xs text-slate-500">${formatDate(item.data)}</div></div>
       <div class="text-sm font-bold text-lime-300">${item.serie}×${item.ripetizioni}${item.peso ? ` · ${item.peso} kg` : ''}</div>
@@ -42,9 +46,8 @@ function renderWorkouts() {
     return groups;
   }, {});
 
-  const container = document.getElementById('workout-history');
   const dates = Object.keys(grouped);
-  container.innerHTML = dates.length ? dates.map((date) => {
+  document.getElementById('workout-history').innerHTML = dates.length ? dates.map((date) => {
     const volume = grouped[date].reduce((total, item) => total + exerciseVolume(item), 0);
     return `
       <div class="rounded-3xl border border-white/5 overflow-hidden">
@@ -85,8 +88,8 @@ function renderProgressChart() {
 
   const values = series.map(([, item]) => item.peso);
   const min = Math.min(...values), max = Math.max(...values), range = max - min || 1;
-  const points = series.map(([date, item], index) => `${(index / (series.length - 1)) * 560 + 20},${190 - ((item.peso - min) / range) * 150}`).join(' ');
-  chart.innerHTML = `<polyline points="${points}" fill="none" stroke="#bef264" stroke-width="3" stroke-linecap="round"/><circle cx="${points.split(' ').at(-1).split(',')[0]}" cy="${points.split(' ').at(-1).split(',')[1]}" r="5" fill="#bef264"/>`;
+  const coords = series.map(([date, item], index) => `${(index / (series.length - 1)) * 560 + 20},${190 - ((item.peso - min) / range) * 150}`).join(' ');
+  chart.innerHTML = `<polyline points="${coords}" fill="none" stroke="#bef264" stroke-width="3" stroke-linecap="round"/><circle cx="${coords.split(' ').at(-1).split(',')[0]}" cy="${coords.split(' ').at(-1).split(',')[1]}" r="5" fill="#bef264"/>`;
 }
 
 async function deleteWorkout(id) {
@@ -102,13 +105,6 @@ async function deleteCheckin(id) {
   showToast('Check-in eliminato.');
   await loadGymData();
 }
-
-document.querySelectorAll('[data-section]').forEach((button) => {
-  button.addEventListener('click', () => {
-    document.querySelectorAll('[data-section]').forEach((item) => item.classList.toggle('active', item === button));
-    ['dashboard', 'allenamento', 'progressi', 'profilo'].forEach((section) => document.getElementById(`sec-${section}`).classList.toggle('hidden', section !== button.dataset.section));
-  });
-});
 
 document.getElementById('workout-form').addEventListener('submit', async (event) => {
   event.preventDefault();
