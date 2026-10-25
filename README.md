@@ -1,21 +1,19 @@
-# Tempra
+# Tempra Gym
 
-Tempra è un'applicazione web per monitorare peso e misure corporee e stimare calorie e macronutrienti degli alimenti, anche a partire dalla foto di un'etichetta nutrizionale.
+Tempra Gym è un’applicazione web multi-utente per registrare allenamenti, monitorare carichi e volume, salvare check-in fisici e seguire i progressi nel tempo.
 
 ## Funzionalità
 
-- Registrazione di check-in con peso, vita, fianchi, petto, braccio e coscia
-- Cronologia dei check-in
-- Modifica ed eliminazione dei record
-- Stima di calorie, proteine, carboidrati e grassi tramite Google Gemini
-- Supporto facoltativo alle foto delle etichette nutrizionali
-- Database SQLite locale oppure Turso per dati persistenti
-
-## Requisiti
-
-- Node.js 20 o superiore
-- Un account Turso (opzionale, consigliato in produzione)
-- Una API key Google Gemini
+- Registrazione e accesso con email e password
+- Sessioni sicure tramite cookie HttpOnly
+- Ogni utente accede esclusivamente ai propri dati
+- Registrazione di esercizi, serie, ripetizioni e carico
+- Calcolo automatico del volume sollevato
+- Cronologia degli allenamenti raggruppata per giorno
+- Grafico di progressione per esercizio
+- Check-in con peso e misure corporee
+- Profilo personale con nome, email, obiettivo, dispendio energetico e data di iscrizione
+- Interfaccia premium sportiva, dark mode e neon verde lime
 
 ## Installazione
 
@@ -25,54 +23,38 @@ cp .env.example .env
 npm start
 ```
 
-L'applicazione sarà disponibile su `http://localhost:10000`.
+Aggiungi nel file `.env`:
 
-## Variabili d'ambiente
+```env
+SESSION_SECRET=una-stringa-lunga-e-casuale
+PORT=10000
+```
 
-| Variabile | Obbligatoria | Descrizione |
-|---|---:|---|
-| `PORT` | No | Porta HTTP; predefinita `10000` |
-| `TURSO_DATABASE_URL` | No | URL del database Turso |
-| `TURSO_AUTH_TOKEN` | Solo con Turso | Token di accesso Turso |
-| `GEMINI_API_KEY` | Per la stima calorie | API key Google Gemini |
-| `GEMINI_MODEL` | No | Modello Gemini; predefinito `gemini-3.6-flash` |
-| `GEMINI_TIMEOUT_MS` | No | Timeout richieste Gemini; predefinito `20000` |
+Per dati persistenti in produzione configura Turso:
 
-Senza `TURSO_DATABASE_URL`, l'app usa un file SQLite locale. Su piattaforme come Render il file locale viene azzerato a ogni deploy o riavvio: usa Turso per conservare i dati.
+```env
+TURSO_DATABASE_URL=...
+TURSO_AUTH_TOKEN=...
+```
 
 ## API
 
 | Metodo | Endpoint | Descrizione |
 |---|---|---|
-| `GET` | `/api/health` | Stato dell'applicazione e database |
-| `GET` | `/api/checkin` | Elenco check-in |
-| `POST` | `/api/checkin` | Crea un check-in |
-| `PUT` | `/api/checkin/:id` | Aggiorna un check-in |
-| `DELETE` | `/api/checkin/:id` | Elimina un check-in |
-| `POST` | `/api/stima-calorie` | Stima calorie e macronutrienti |
-
-### Esempio check-in
-
-```bash
-curl -X POST http://localhost:10000/api/checkin \
-  -H "Content-Type: application/json" \
-  -d '{"peso":78.4,"vita":82,"fianchi":98}'
-```
-
-### Esempio stima calorie
-
-```bash
-curl -X POST http://localhost:10000/api/stima-calorie \
-  -H "Content-Type: application/json" \
-  -d '{"alimento":"riso basmati","peso":"80"}'
-```
+| POST | `/api/auth/register` | Crea un account |
+| POST | `/api/auth/login` | Accede |
+| POST | `/api/auth/logout` | Termina la sessione |
+| GET | `/api/auth/me` | Dati dell’utente collegato |
+| PATCH | `/api/profile` | Aggiorna profilo e obiettivi |
+| GET/POST | `/api/workouts` | Legge o crea allenamenti |
+| DELETE | `/api/workouts/:id` | Elimina un esercizio |
+| GET/POST | `/api/checkin` | Legge o crea check-in |
+| DELETE | `/api/checkin/:id` | Elimina un check-in |
 
 ## Deploy
 
-Il progetto è pronto per piattaforme Node.js come Render. Configura le variabili d'ambiente nel pannello della piattaforma e usa:
+Configura `SESSION_SECRET`, `TURSO_DATABASE_URL` e `TURSO_AUTH_TOKEN` nella piattaforma di deploy, quindi avvia:
 
 ```bash
 npm start
 ```
-
-Per la produzione, configura Turso per evitare la perdita dei dati tra deploy.

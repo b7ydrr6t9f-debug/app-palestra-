@@ -1,130 +1,104 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#05070a">
-<title>Tempra · Allenati con precisione</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#05070a">
+<title>Tempra Gym</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--lime:#bef264;--lime-strong:#a3e635;--ink:#05070a;--card:rgba(10,14,20,.82);--line:rgba(190,242,100,.14)}
+:root{--lime:#bef264;--ink:#05070a}
 *{scrollbar-width:thin;scrollbar-color:#1f2937 transparent}
-::-webkit-scrollbar{width:7px;height:7px}
-::-webkit-scrollbar-thumb{background:#1f2937;border-radius:99px}
-body{font-family:Inter,system-ui,sans-serif;background:var(--ink);color:#e7ecf3;overflow-x:hidden}
-h1,h2,h3,.display{font-family:Sora,Inter,sans-serif;letter-spacing:-.02em}
-.bg-sport{position:fixed;inset:0;z-index:-2;background:radial-gradient(1000px 600px at 12% -10%,rgba(163,230,53,.16),transparent 60%),radial-gradient(900px 600px at 100% 10%,rgba(56,189,248,.10),transparent 55%),#05070a}
+body{font-family:Inter,sans-serif;background:var(--ink);color:#e7ecf3;overflow-x:hidden}
+h1,h2,h3,.display{font-family:Sora,sans-serif;letter-spacing:-.02em}
+.bg-sport{position:fixed;inset:0;z-index:-2;background:radial-gradient(900px 550px at 10% -10%,rgba(190,242,100,.15),transparent 60%),radial-gradient(800px 550px at 100% 0%,rgba(34,211,238,.09),transparent 55%),#05070a}
 .bg-lines{position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(190,242,100,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(190,242,100,.05) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(circle at 50% 0%,black,transparent 78%)}
-.card{background:var(--card);border:1px solid rgba(148,163,184,.10);backdrop-filter:blur(16px);border-radius:24px;box-shadow:0 24px 70px -35px rgba(0,0,0,.9)}
+.card{background:rgba(10,14,20,.82);border:1px solid rgba(148,163,184,.10);backdrop-filter:blur(16px);border-radius:24px;box-shadow:0 24px 70px -35px rgba(0,0,0,.9)}
 .card-hover{transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .25s}
 .card-hover:hover{transform:translateY(-3px);border-color:rgba(190,242,100,.35);box-shadow:0 30px 80px -35px rgba(163,230,53,.22)}
-.lime{color:var(--lime)}
-.lime-glow{text-shadow:0 0 22px rgba(190,242,100,.45)}
-.gradient-lime{background:linear-gradient(90deg,#bef264,#a3e635 55%,#4ade80);-webkit-background-clip:text;background-clip:text;color:transparent}
 .kicker{font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#7c8896}
-.tab-btn{position:relative;color:#6b7684;transition:color .2s}
-.tab-btn:hover{color:#d7dee7}
-.tab-btn.active{color:#fff}
-.tab-underline{transform:scaleX(0);transition:transform .28s cubic-bezier(.2,.8,.2,1)}
-.tab-btn.active .tab-underline{transform:scaleX(1)}
+.lime{color:#bef264}.lime-glow{text-shadow:0 0 22px rgba(190,242,100,.45)}
+.gradient-lime{background:linear-gradient(90deg,#bef264,#a3e635,#4ade80);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tab-btn{position:relative;color:#6b7684;transition:color .2s}.tab-btn.active{color:#fff}
+.tab-underline{transform:scaleX(0);transition:transform .28s cubic-bezier(.2,.8,.2,1)}.tab-btn.active .tab-underline{transform:scaleX(1)}
 .section{animation:sectionIn .42s cubic-bezier(.2,.8,.2,1)}
 @keyframes sectionIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
-.reveal.visible{opacity:1;transform:none}
-.btn{position:relative;overflow:hidden;transition:transform .15s ease,box-shadow .2s ease,filter .2s ease}
-.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
-.btn:active{transform:scale(.98)}
-.btn:disabled{opacity:.6;transform:none;cursor:not-allowed}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}.reveal.visible{opacity:1;transform:none}
+.btn{position:relative;overflow:hidden;transition:transform .15s ease,filter .2s ease}.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}.btn:active{transform:scale(.98)}.btn:disabled{opacity:.6;transform:none;cursor:not-allowed}
 .btn-lime{background:linear-gradient(135deg,#bef264,#84cc16);color:#08110a;box-shadow:0 14px 35px -15px rgba(163,230,53,.55)}
 .ripple{position:absolute;border-radius:50%;background:rgba(190,242,100,.35);transform:scale(0);animation:ripple .55s linear;pointer-events:none}
 @keyframes ripple{to{transform:scale(3.2);opacity:0}}
-.input{background:rgba(3,6,10,.72);border:1px solid rgba(148,163,184,.14);transition:border-color .2s,box-shadow .2s}
-.input:focus{outline:none;border-color:rgba(190,242,100,.7);box-shadow:0 0 0 4px rgba(190,242,100,.12)}
+.input{background:rgba(3,6,10,.72);border:1px solid rgba(148,163,184,.14);transition:border-color .2s,box-shadow .2s}.input:focus{outline:none;border-color:rgba(190,242,100,.7);box-shadow:0 0 0 4px rgba(190,242,100,.12)}
 .pill{border:1px solid rgba(190,242,100,.18);background:rgba(190,242,100,.07)}
-.live-dot{width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 0 rgba(190,242,100,.55);animation:pulse 2s infinite}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#bef264;box-shadow:0 0 0 0 rgba(190,242,100,.55);animation:pulse 2s infinite}
 @keyframes pulse{70%{box-shadow:0 0 0 10px rgba(190,242,100,0)}100%{box-shadow:0 0 0 0 rgba(190,242,100,0)}}
-.ring-bg{stroke:rgba(148,163,184,.14)}
-.ring-value{stroke:url(#limeGradient);transition:stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1)}
+.hidden{display:none!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
 </style>
 </head>
 <body class="min-h-screen flex flex-col">
 <div class="bg-sport"></div><div class="bg-lines"></div>
+
+<div id="auth-screen" class="fixed inset-0 z-50 grid place-items-center px-5">
+<div class="card w-full max-w-md p-7">
+<div class="flex items-center gap-3 mb-6"><div class="w-11 h-11 rounded-2xl bg-white/5 border border-lime-300/20 grid place-items-center"><i class="fa-solid fa-bolt lime text-lg lime-glow"></i></div><div><h1 class="text-xl font-extrabold text-white">TEM<span class="gradient-lime">PRA</span> GYM</h1><p class="text-xs text-slate-400">Allenati, misura, progredisci.</p></div></div>
+<div class="grid grid-cols-2 gap-1 bg-white/5 p-1 rounded-2xl text-xs font-bold mb-5"><button id="login-tab" class="py-2.5 rounded-xl bg-lime-300 text-[#08110a]">Accedi</button><button id="register-tab" class="py-2.5 rounded-xl text-slate-400">Registrati</button></div>
+<form id="auth-form" class="space-y-3">
+<div id="name-field" class="hidden"><label class="kicker block mb-1">Nome</label><input id="auth-nome" type="text" class="input w-full rounded-2xl px-4 py-3 text-sm text-white" placeholder="Il tuo nome"></div>
+<div><label class="kicker block mb-1">Email</label><input id="auth-email" type="email" required class="input w-full rounded-2xl px-4 py-3 text-sm text-white" placeholder="nome@email.com"></div>
+<div><label class="kicker block mb-1">Password</label><input id="auth-password" type="password" required minlength="8" class="input w-full rounded-2xl px-4 py-3 text-sm text-white" placeholder="Almeno 8 caratteri"></div>
+<button class="btn btn-lime w-full py-3 rounded-2xl font-extrabold text-sm" id="auth-submit">Accedi</button>
+<p id="auth-error" class="hidden text-rose-400 text-xs"></p>
+</form>
+</div>
+</div>
+
+<div id="app" class="hidden min-h-screen flex flex-col">
 <header class="sticky top-0 z-40 border-b border-white/5 bg-[#05070a]/85 backdrop-blur-xl px-5 sm:px-8 pt-4">
 <div class="max-w-6xl mx-auto flex items-center justify-between gap-4 pb-4">
-<div class="flex items-center gap-3">
-<div class="w-11 h-11 rounded-2xl bg-[#0b1016] border border-lime-300/20 grid place-items-center">
-<i class="fa-solid fa-bolt lime text-lg lime-glow"></i>
-</div>
-<div><h1 class="text-xl font-extrabold text-white">TEM<span class="gradient-lime">PRA</span></h1><p class="text-[11px] text-slate-400" id="current-date"></p></div>
-</div>
-<div class="hidden sm:flex items-center gap-2 pill px-3 py-2 rounded-full text-[11px] font-semibold text-lime-200"><span class="live-dot"></span> Pronto</div>
+<div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl bg-white/5 border border-lime-300/20 grid place-items-center"><i class="fa-solid fa-bolt lime lime-glow"></i></div><div><h1 class="text-xl font-extrabold text-white">TEM<span class="gradient-lime">PRA</span></h1><p class="text-[11px] text-slate-400">La tua palestra, i tuoi progressi</p></div></div>
+<div class="flex items-center gap-3"><div class="hidden sm:flex items-center gap-2 pill px-3 py-2 rounded-full text-[11px] font-bold text-lime-200"><span class="live-dot"></span> Account attivo</div><button id="logout-btn" class="btn text-slate-400 hover:text-rose-300 p-2 rounded-xl hover:bg-white/5" title="Esci"><i class="fa-solid fa-right-from-bracket"></i></button></div>
 </div>
 <nav class="max-w-6xl mx-auto flex gap-4 sm:gap-7 -mb-px text-sm font-bold overflow-x-auto">
-<button onclick="cambiaSezione('abitudini')" id="tab-abitudini" class="tab-btn active pb-3 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-bolt text-lime-300"></i> Abitudini<span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-lime-300 rounded-full"></span></button>
-<button onclick="cambiaSezione('alimentazione')" id="tab-alimentazione" class="tab-btn pb-3 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-utensils text-lime-300"></i> Nutrizione<span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-lime-300 rounded-full"></span></button>
-<button onclick="cambiaSezione('allenamento')" id="tab-allenamento" class="tab-btn pb-3 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-dumbbell text-lime-300"></i> Allenamento<span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-lime-300 rounded-full"></span></button>
-<button onclick="cambiaSezione('profilo')" id="tab-profilo" class="tab-btn pb-3 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-user text-lime-300"></i> Profilo<span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-lime-300 rounded-full"></span></button>
+<button data-section="dashboard" class="tab-btn active pb-3 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-chart-line lime"></i> Dashboard<span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-lime-300 rounded-full"></span></button>
+<button data-section="allenamento" class="tab-btn pb-3 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-dumbbell lime"></i> Allenamento<span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-lime-300 rounded-full"></span></button>
+<button data-section="progressi" class="tab-btn pb-3 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-arrow-trend-up lime"></i> Progressi<span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-lime-300 rounded-full"></span></button>
+<button data-section="profilo" class="tab-btn pb-3 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-user lime"></i> Profilo<span class="tab-underline absolute left-0 right-0 -bottom-px h-0.5 bg-lime-300 rounded-full"></span></button>
 </nav>
 </header>
-<main class="flex-1 max-w-6xl w-full mx-auto px-5 sm:px-8 py-7 sm:py-9 space-y-7">
-<section id="sec-abitudini" class="section space-y-6">
+<main class="flex-1 max-w-6xl w-full mx-auto px-5 sm:px-8 py-7 space-y-7">
+<section id="sec-dashboard" class="section space-y-6">
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-<div class="card card-hover reveal p-5"><div class="kicker">Completate</div><div id="completed-count" class="display text-3xl font-extrabold text-white mt-2">0 / 0</div><div class="h-1.5 mt-4 rounded-full bg-white/5 overflow-hidden"><div id="habits-progress" class="h-full w-0 rounded-full bg-gradient-to-r from-lime-300 to-emerald-400 transition-all duration-700"></div></div></div>
-<div class="card card-hover reveal p-5"><div class="kicker">Streak</div><div id="streak-count" class="display text-3xl font-extrabold text-lime-300 mt-2 lime-glow">🔥 0 giorni</div></div>
-<div class="card reveal p-5 col-span-2"><div class="kicker mb-3">Nuova abitudine</div><form id="habit-form" class="flex gap-3"><input id="habit-input" type="text" placeholder="Aggiungi un obiettivo quotidiano" required class="input flex-1 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500"><button class="btn btn-lime px-6 py-3 rounded-2xl font-extrabold text-sm">Aggiungi</button></form></div>
+<div class="card card-hover reveal p-5"><div class="kicker">Allenamenti</div><div id="stat-workouts" class="display text-3xl font-extrabold text-white mt-2">0</div><p class="text-xs text-slate-500 mt-1">Sessioni registrate</p></div>
+<div class="card card-hover reveal p-5"><div class="kicker">Volume totale</div><div id="stat-volume" class="display text-3xl font-extrabold text-lime-300 lime-glow mt-2">0</div><p class="text-xs text-slate-500 mt-1">Chilogrammi sollevati</p></div>
+<div class="card card-hover reveal p-5"><div class="kicker">Esercizi</div><div id="stat-exercises" class="display text-3xl font-extrabold text-white mt-2">0</div><p class="text-xs text-slate-500 mt-1">Esercizi unici</p></div>
+<div class="card card-hover reveal p-5"><div class="kicker">Ultima sessione</div><div id="stat-last" class="display text-lg font-extrabold text-white mt-2">—</div><p class="text-xs text-slate-500 mt-1">Data ultimo allenamento</p></div>
 </div>
-<div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Le tue abitudini</h2><div id="habits-list" class="space-y-3"></div></div>
-</section>
-<section id="sec-alimentazione" class="hidden space-y-6">
-<div class="grid lg:grid-cols-5 gap-4">
-<div class="card card-hover reveal p-6 lg:col-span-3">
-<div class="flex items-start justify-between"><div><div class="kicker">Calorie di oggi</div><div class="flex items-end gap-2 mt-1"><span id="cal-totale-oggi" class="display text-5xl font-extrabold text-white">0</span><span class="text-slate-400 mb-1">kcal</span></div></div><div class="relative w-24 h-24"><svg viewBox="0 0 100 100" class="w-full h-full -rotate-90"><defs><linearGradient id="limeGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#bef264"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs><circle class="ring-bg" cx="50" cy="50" r="42" fill="none" stroke-width="8"/><circle id="calorie-ring-progress" class="ring-value" cx="50" cy="50" r="42" fill="none" stroke-width="8" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="263.9"/></svg><div class="absolute inset-0 grid place-items-center"><span id="calorie-ring-label" class="text-sm font-extrabold text-white">0%</span></div></div></div>
-<div class="h-2 rounded-full bg-white/5 overflow-hidden mt-5"><div id="cal-barra" class="h-full w-0 bg-gradient-to-r from-lime-300 to-cyan-400 rounded-full transition-all duration-700"></div></div>
-<div class="grid grid-cols-3 gap-3 mt-5">
-<div class="rounded-2xl bg-white/[.03] border border-white/5 p-3 text-center"><div id="cal-proteine" class="text-lg font-bold text-lime-300">0g</div><div class="kicker mt-1">Proteine</div></div>
-<div class="rounded-2xl bg-white/[.03] border border-white/5 p-3 text-center"><div id="cal-carbo" class="text-lg font-bold text-cyan-300">0g</div><div class="kicker mt-1">Carboidrati</div></div>
-<div class="rounded-2xl bg-white/[.03] border border-white/5 p-3 text-center"><div id="cal-grassi" class="text-lg font-bold text-amber-300">0g</div><div class="kicker mt-1">Grassi</div></div>
-</div>
-<div class="text-xs text-slate-500 mt-4" id="cal-obiettivo-label"></div>
-</div>
-<div class="card card-hover reveal p-6 lg:col-span-2"><div class="flex items-center justify-between mb-4"><div class="kicker">Bilancio energetico</div><span class="text-[11px] text-slate-500" id="deficit-dispendio-label"></span></div><div class="space-y-3"><div class="rounded-2xl bg-white/[.03] border border-white/5 p-4"><div class="kicker">Oggi</div><div id="deficit-oggi" class="display text-2xl font-extrabold text-white">-</div></div><div class="rounded-2xl bg-white/[.03] border border-white/5 p-4"><div class="kicker">Ultimi 7 giorni</div><div id="deficit-settimana" class="display text-2xl font-extrabold text-white">-</div></div></div><p class="text-[11px] text-slate-500 mt-4">Verde = deficit · Rosso = surplus.</p></div>
-</div>
-<div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4"><i class="fa-solid fa-wand-magic-sparkles lime mr-2"></i>Aggiungi alimento</h2>
-<div class="grid grid-cols-2 gap-1 bg-white/[.04] p-1 rounded-2xl mb-5 text-xs font-bold">
-<button type="button" id="food-modo-ai" onclick="impostaModoInserimento('ai')" class="py-2.5 rounded-xl transition"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Stima AI</button>
-<button type="button" id="food-modo-manuale" onclick="impostaModoInserimento('manuale')" class="py-2.5 rounded-xl transition"><i class="fa-solid fa-pen mr-1"></i> Manuale</button>
-</div>
-<form id="food-form" class="space-y-4">
-<div class="grid grid-cols-3 gap-3"><input id="food-alimento" type="text" placeholder="Alimento" required class="input col-span-2 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500"><input id="food-peso" type="number" min="1" placeholder="Grammi" required class="input rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500"></div>
-<label id="food-label-etichetta" for="food-etichetta" class="flex items-center gap-3 bg-white/[.03] border border-dashed border-white/10 rounded-2xl px-4 py-4 text-sm text-slate-400 cursor-pointer hover:border-lime-300/50 transition"><i class="fa-solid fa-camera lime"></i><span id="food-etichetta-testo">Foto etichetta nutrizionale, opzionale</span><input type="file" id="food-etichetta" accept="image/*" capture="environment" class="hidden"></label>
-<div id="food-blocco-manuale" class="hidden space-y-3">
-<div class="grid grid-cols-2 gap-1 bg-white/[.04] p-1 rounded-2xl text-xs font-bold"><button type="button" id="food-base-100g" onclick="impostaBaseManuale('100g')" class="py-2.5 rounded-xl transition">Per 100g</button><button type="button" id="food-base-porzione" onclick="impostaBaseManuale('porzione')" class="py-2.5 rounded-xl transition">Per porzione</button></div>
-<p id="food-base-hint" class="text-[11px] text-slate-500"></p>
-<div class="grid grid-cols-4 gap-2"><input id="food-man-calorie" type="number" min="0" placeholder="Kcal" class="input rounded-xl px-2 py-2.5 text-sm text-white placeholder-slate-500"><input id="food-man-proteine" type="number" min="0" step="0.1" placeholder="Prot." class="input rounded-xl px-2 py-2.5 text-sm text-white placeholder-slate-500"><input id="food-man-carbo" type="number" min="0" step="0.1" placeholder="Carb." class="input rounded-xl px-2 py-2.5 text-sm text-white placeholder-slate-500"><input id="food-man-grassi" type="number" min="0" step="0.1" placeholder="Grassi" class="input rounded-xl px-2 py-2.5 text-sm text-white placeholder-slate-500"></div>
-</div>
-<button id="food-submit-btn" type="submit" class="btn btn-lime w-full px-6 py-3.5 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2"><i class="fa-solid fa-plus"></i> Aggiungi alimento</button>
-</form><p id="food-errore" class="hidden text-rose-400 text-xs mt-3"></p></div>
-<div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Pasti di oggi</h2><div id="food-list" class="space-y-2"></div></div>
+<div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Ultimi allenamenti</h2><div id="recent-workouts" class="space-y-3"></div></div>
 </section>
 <section id="sec-allenamento" class="hidden space-y-6">
-<div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4"><i class="fa-solid fa-dumbbell lime mr-2"></i>Registra esercizio</h2>
-<form id="workout-form" class="grid grid-cols-2 sm:grid-cols-5 gap-3"><input id="w-esercizio" type="text" placeholder="Esercizio" required class="input col-span-2 sm:col-span-2 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500"><input id="w-serie" type="number" min="1" placeholder="Serie" required class="input rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500"><input id="w-ripetizioni" type="number" min="1" placeholder="Rip." required class="input rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500"><input id="w-peso" type="number" min="0" step="0.5" placeholder="Kg" class="input rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500"><div class="col-span-2 sm:col-span-5"><label class="kicker block mb-1">Data</label><input id="w-data" type="date" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><button type="submit" class="btn btn-lime col-span-2 sm:col-span-5 px-6 py-3 rounded-2xl font-extrabold text-sm">Aggiungi alla sessione</button></form></div>
-<div id="workout-history" class="space-y-4"></div>
-<div class="card reveal p-6"><h3 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Progressione</h3><select id="select-esercizio-grafico" class="input w-full rounded-2xl px-4 py-3 text-sm text-white mb-4"><option value="">Scegli un esercizio...</option></select><svg id="esercizio-sparkline" viewBox="0 0 300 80" class="w-full h-24"></svg></div>
+<div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Registra esercizio</h2><form id="workout-form" class="grid grid-cols-2 sm:grid-cols-5 gap-3"><input id="w-esercizio" type="text" placeholder="Esercizio" required class="input col-span-2 sm:col-span-2 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500"><input id="w-serie" type="number" min="1" placeholder="Serie" required class="input rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500"><input id="w-ripetizioni" type="number" min="1" placeholder="Rip." required class="input rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500"><input id="w-peso" type="number" min="0" step="0.5" placeholder="Kg" class="input rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500"><div class="col-span-2 sm:col-span-5"><label class="kicker block mb-1">Data</label><input id="w-data" type="date" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><button class="btn btn-lime col-span-2 sm:col-span-5 px-6 py-3 rounded-2xl font-extrabold text-sm">Aggiungi alla sessione</button></form></div>
+<div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Storico</h2><div id="workout-history" class="space-y-4"></div></div>
+</section>
+<section id="sec-progressi" class="hidden space-y-6">
+<div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Progressione esercizio</h2><select id="progress-exercise" class="input w-full rounded-2xl px-4 py-3 text-sm text-white mb-4"><option value="">Scegli un esercizio</option></select><svg id="progress-chart" viewBox="0 0 600 220" class="w-full h-56"></svg></div>
+<div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Check-in fisico</h2><form id="checkin-form" class="grid grid-cols-2 sm:grid-cols-3 gap-3"><div><label class="kicker block mb-1">Peso kg *</label><input id="c-peso" type="number" step="0.1" required class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><div><label class="kicker block mb-1">Vita cm</label><input id="c-vita" type="number" step="0.1" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><div><label class="kicker block mb-1">Fianchi cm</label><input id="c-fianchi" type="number" step="0.1" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><div><label class="kicker block mb-1">Petto cm</label><input id="c-petto" type="number" step="0.1" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><div><label class="kicker block mb-1">Braccio cm</label><input id="c-braccio" type="number" step="0.1" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><div><label class="kicker block mb-1">Coscia cm</label><input id="c-coscia" type="number" step="0.1" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><button class="btn btn-lime col-span-2 sm:col-span-3 px-6 py-3 rounded-2xl font-extrabold text-sm">Salva check-in</button></form></div>
+<div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Storico misure</h2><div id="checkin-history" class="space-y-3"></div></div>
 </section>
 <section id="sec-profilo" class="hidden space-y-6">
-<div class="grid lg:grid-cols-2 gap-4">
-<div class="card card-hover reveal p-6"><div class="kicker">Dispendio giornaliero</div><div class="flex items-center gap-3 mt-2"><span id="dispendio-valore" class="display text-3xl font-extrabold text-white">2200 kcal</span><button onclick="modificaDispendio()" class="btn text-slate-500 hover:text-lime-300 p-2 rounded-xl hover:bg-white/5"><i class="fa-solid fa-pen text-sm"></i></button></div><p class="text-xs text-slate-500 mt-3">Base per il calcolo del deficit o surplus.</p></div>
-<div class="card reveal p-6"><div id="checkin-reminder" class="hidden flex items-center gap-3 text-sm text-lime-200"><i class="fa-solid fa-calendar-check"></i> È venerdì mattina: check-in settimanale.</div><button id="btn-attiva-notifiche" class="btn w-full card px-4 py-3 rounded-2xl text-sm font-bold text-slate-300 hover:border-lime-300/40 flex items-center justify-center gap-2"><i class="fa-solid fa-bell"></i> Attiva promemoria</button></div>
+<div class="card reveal p-6"><div class="flex items-center gap-4"><div class="w-16 h-16 rounded-3xl bg-lime-300/10 border border-lime-300/25 grid place-items-center"><i class="fa-solid fa-user lime text-xl"></i></div><div><h2 id="profile-name" class="display text-2xl font-extrabold text-white">—</h2><p id="profile-email" class="text-sm text-slate-400">—</p></div></div></div>
+<div class="grid sm:grid-cols-3 gap-4">
+<div class="card reveal p-5"><div class="kicker">Membro dal</div><div id="profile-since" class="display text-lg font-bold text-white mt-2">—</div></div>
+<div class="card reveal p-5"><div class="kicker">Obiettivo</div><div id="profile-goal" class="display text-lg font-bold text-lime-300 mt-1">—</div></div>
+<div class="card reveal p-5"><div class="kicker">Dispendio</div><div id="profile-tdee" class="display text-lg font-bold text-white mt-1">—</div></div>
 </div>
-<div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-1"><i class="fa-solid fa-ruler-combined lime mr-2"></i>Check-in settimanale</h2><p class="text-xs text-slate-500 mb-5">Registra peso e misure per seguire i progressi.</p><form id="checkin-form" class="grid grid-cols-2 sm:grid-cols-3 gap-3"><div><label class="kicker block mb-1">Peso kg *</label><input id="c-peso" type="number" step="0.1" required class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><div><label class="kicker block mb-1">Vita cm</label><input id="c-vita" type="number" step="0.1" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><div><label class="kicker block mb-1">Fianchi cm</label><input id="c-fianchi" type="number" step="0.1" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><div><label class="kicker block mb-1">Petto cm</label><input id="c-petto" type="number" step="0.1" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><div><label class="kicker block mb-1">Braccio cm</label><input id="c-braccio" type="number" step="0.1" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><div><label class="kicker block mb-1">Coscia cm</label><input id="c-coscia" type="number" step="0.1" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><button type="submit" class="btn btn-lime col-span-2 sm:col-span-3 px-6 py-3 rounded-2xl font-extrabold text-sm">Salva check-in</button></form></div>
-<div class="grid lg:grid-cols-2 gap-4"><div class="card reveal p-6"><h3 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Andamento peso</h3><svg id="peso-sparkline" viewBox="0 0 300 80" class="w-full h-24"></svg></div><div class="card reveal p-6"><h3 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Storico</h3><div id="checkin-list" class="space-y-2"></div></div></div>
+<div class="card reveal p-6"><h2 class="text-sm font-bold uppercase tracking-widest text-slate-300 mb-4">Modifica profilo</h2><form id="profile-form" class="grid sm:grid-cols-3 gap-3"><div><label class="kicker block mb-1">Nome</label><input id="p-nome" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><div><label class="kicker block mb-1">Obiettivo</label><select id="p-obiettivo" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"><option>Ipertrofia</option><option>Forza</option><option>Dimagrimento</option><option>Mantenimento</option></select></div><div><label class="kicker block mb-1">Dispendio kcal</label><input id="p-dispendio" type="number" min="1" class="input w-full rounded-2xl px-4 py-3 text-sm text-white"></div><button class="btn btn-lime sm:col-span-3 px-6 py-3 rounded-2xl font-extrabold text-sm">Salva profilo</button></form></div>
 </section>
 </main>
-<footer class="max-w-6xl mx-auto w-full px-5 sm:px-8 pb-8"><div class="card px-5 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500"><span>TEM<span class="lime">PRA</span> · Allenati con precisione</span><span>Premi <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white">1</kbd>–<kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white">4</kbd> per navigare</span></div></footer>
-<script src="js/nav.js"></script><script src="js/abitudini.js"></script><script src="js/alimentazione.js"></script><script src="js/allenamento.js"></script><script src="js/profilo.js"></script><script src="js/enhancements.js"></script>
+</div>
+<div id="toast-container" class="fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 space-y-2"></div>
+<script src="js/enhancements.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/gym.js"></script>
 </body>
 </html>
