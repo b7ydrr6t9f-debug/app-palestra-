@@ -20,6 +20,7 @@ async function api(url, options = {}) {
 
 function showApp(user) {
   currentUser = user;
+  document.getElementById('landing').classList.add('hidden');
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('profile-name').textContent = user.nome;
@@ -36,7 +37,9 @@ function showApp(user) {
 function showAuth() {
   currentUser = null;
   document.getElementById('app').classList.add('hidden');
+  document.getElementById('landing').classList.remove('hidden');
   document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('auth-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 let authMode = 'login';
